@@ -1,0 +1,3 @@
+/home/zakareeyah/CLionProjects/IMX/cmake-build-debug/CMakeFiles/IMX.dir
+/home/zakareeyah/CLionProjects/IMX/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/zakareeyah/CLionProjects/IMX/cmake-build-debug/CMakeFiles/rebuild_cache.dir
