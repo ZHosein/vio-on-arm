@@ -28,3 +28,7 @@ RUN apt install -y gcc-aarch64-linux-gnu
 RUN apt install -y g++-aarch64-linux-gnu
 RUN apt install -y binutils-aarch64-linux-gnu
 
+# my additions
+# --- for CLion Integration ---
+RUN apt install -y gdb-multiarch
+# --- for CLion Integration ---
