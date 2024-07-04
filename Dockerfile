@@ -6,6 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
 # Set the working directory to /root
+#TODO: change to "ENV DIRPATH=/root
 ENV DIRPATH /root
 WORKDIR $DIRPATH
 
@@ -32,3 +33,19 @@ RUN apt install -y binutils-aarch64-linux-gnu
 # --- for CLion Integration ---
 RUN apt install -y gdb-multiarch
 # --- for CLion Integration ---
+
+# Cross Compiling OpenCV (to /usr/local - this path is already in the dynamic linker by default
+RUN git clone --filter=blob:none https://github.com/opencv/opencv.git
+RUN cd opencv && git checkout tags/4.6.0
+RUN git clone --filter=blob:none  https://github.com/opencv/opencv_contrib.git
+RUN cd opencv_contrib/ &&  git checkout tags/4.6.0
+RUN cd opencv/platforms/linux/ && mkdir build && cd build && \
+    cmake -DCMAKE_TOOLCHAIN_FILE=../aarch64-gnu.toolchain.cmake  \
+          -DCMAKE_BUILD_TYPE=Release -D BUILD_opencv_python=OFF -D BUILD_opencv_python2=OFF -D BUILD_opencv_python3=OFF  \
+          -DOPENCV_EXTRA_MODULES_PATH=/root/opencv_contrib/modules  \
+          -DCMAKE_INSTALL_PREFIX=/usr/local  \
+          ../../.. && \
+    make -j4 && \
+    make install
+
+# remove opencv & opencv_contrib directories?
