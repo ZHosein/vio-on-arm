@@ -1,10 +1,11 @@
 #include <iostream>
 
-#include "detectMarkers.cpp"
+#include "poseDetection.cpp"
+
 
 int main()
 {
-    detectMarkers();
+    detectPose();
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }
