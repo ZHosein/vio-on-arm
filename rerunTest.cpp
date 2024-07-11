@@ -14,5 +14,7 @@ void logTrans() {
         "world/camera",
         rerun::Transform3D(rerun::RotationAxisAngle({0.0f, 0.0f, 0.0f}, rerun::Angle::radians(0)), 1.0f)
     );
+
+
     std::cout << "hello world!";
 }

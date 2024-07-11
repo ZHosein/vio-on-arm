@@ -1,9 +1,9 @@
 #include <iostream>
-#include "rerunTest.cpp"
+#include "rerunLogPoseDetection.cpp"
 
 int main()
 {
-    logTrans();
+    detectPose();
     std::cout << "hello world";
     return 0;
 }
