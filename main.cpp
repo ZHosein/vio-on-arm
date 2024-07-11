@@ -1,11 +1,9 @@
 #include <iostream>
-
-#include "poseDetection.cpp"
-
+#include "rerunTest.cpp"
 
 int main()
 {
-    detectPose();
-    std::cout << "Hello, World!" << std::endl;
+    logTrans();
+    std::cout << "hello world";
     return 0;
 }

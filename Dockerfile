@@ -7,7 +7,7 @@ ENV TZ=Etc/UTC
 
 # Set the working directory to /root
 #TODO: change to "ENV DIRPATH=/root
-ENV DIRPATH /root
+ENV DIRPATH=/root
 WORKDIR $DIRPATH
 
 #Install build dependencies
@@ -47,5 +47,18 @@ RUN cd opencv/platforms/linux/ && mkdir build && cd build && \
           ../../.. && \
     make -j4 && \
     make install
+
+# Cross-compiling and install arrow (rerun dep)
+COPY toolchain.cmake $DIRPATH
+RUN git clone https://github.com/apache/arrow.git # consider only cloning the first level of commits (tree=1?)
+RUN cd arrow/cpp && \
+    mkdir "build" && cd build && \
+    cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake  \
+          -DCMAKE_BUILD_TYPE=Debug -DARROW_BUILD_STATIC=ON  -DARROW_DEPENDENCY_SOURCE=BUNDLED  \
+          -DARROW_ENABLE_THREADING=OFF -DARROW_FLIGHT=OFF -DARROW_JEMALLOC=OFF -DARROW_MIMALLOC=OFF -DARROW_BUILD_SHARED=OFF  \
+          -DCMAKE_INSTALL_PREFIX=/usr/local \
+          ..  &&\
+    make -j4 && make install
+
 
 # remove opencv & opencv_contrib directories?
