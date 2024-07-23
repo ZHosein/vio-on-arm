@@ -29,7 +29,7 @@ void detectPose () {
     }
 
     // set coordinate system
-    float markerLength = 0.15;
+    float markerLength = 0.019;
     cv::Mat objPoints(4, 1, CV_32FC3);
     objPoints.ptr<cv::Vec3f>(0)[0] = cv::Vec3f(-markerLength/2.f, markerLength/2.f, 0);
     objPoints.ptr<cv::Vec3f>(0)[1] = cv::Vec3f(markerLength/2.f, markerLength/2.f, 0);
