@@ -219,19 +219,19 @@ namespace selective_data {
            intrinsicsMatrix.at<double>(1, 2),
             0,0));
 
-        cout << endl;
-        cout << intrinsicsMatrix << endl;
-        cout << distCoeffs << endl;
+        std::cout << std::endl;
+        std::cout << intrinsicsMatrix << std::endl;
+        std::cout << distCoeffs << std::endl;
         K->print("K");
-        cout << endl;
+        std::cout << std::endl;
         // Define the camera observation noise model.
-        auto noise = noiseModel::Isotropic::Sigma(2, 1.0); // one pixel in u and v
+        auto noise = gtsam::noiseModel::Isotropic::Sigma(2, 1.0); // one pixel in u and v
 
         // Create the set of ground-truth landmarks - apriltags
-        vector<Point3> points = createPoints(rec);
+        std::vector<gtsam::Point3> points = createPoints(rec);
 
         // Create the set of ground-truth poses
-        vector<Pose3> poses = createPoses(rec);
+        std::vector<gtsam::Pose3> poses = createPoses(rec);
 
         /*// Create a NonlinearISAM object which will relinearize and reorder the variables
         // every "relinearizeInterval" updates
@@ -245,32 +245,32 @@ namespace selective_data {
         // structure is available that allows the user to set various properties, such as the relinearization threshold
         // and type of linear solver. For this example, we we set the relinearization threshold small so the iSAM2 result
         // will approach the batch result.
-        ISAM2Params parameters;
+        gtsam::ISAM2Params parameters;
         parameters.relinearizeThreshold = 0.01;
         // parameters.relinearizeSkip = 10; // works
         // parameters.relinearizeSkip = 9; // works
         parameters.relinearizeSkip = 8; // corresponds to the number of landmarks...conincidence?
         // parameters.relinearizeSkip = 7; // fails: gtsam::IndeterminantLinearSystemException on 7th call
         // parameters.enableRelinearization = false;
-        ISAM2 isam(parameters);
+        gtsam::ISAM2 isam(parameters);
 
         // Create a Factor Graph and Values to hold the new data
-        NonlinearFactorGraph graph;
-        Values initialEstimate;
+        gtsam::NonlinearFactorGraph graph;
+        gtsam::Values initialEstimate;
 
         /*if(numPoses < 0) numPoses = poses.size();
         if(numLandmarks < 0) numLandmarks = points.size();*/
         int currentFrame = 54;
         // Loop over the different poses, adding the observations to iSAM incrementally
         for (size_t i = 0; i < poses.size(); ++i) {
-            logTextTrace(rec, "Current loop: " + to_string(i), i);
+            logTextTrace(rec, "Current loop: " + std::to_string(i), i);
             logPose(rec, poses[i], i, "world/camera");
             // Add factors for each landmark observation
             for (size_t j = 0; j < points.size(); ++j) {
                 // Create ground truth measurement
                 // PinholeCamera<Cal3DS2> camera(poses[i]);
-                PinholeCamera<Cal3DS2> camera(poses[i], *K);
-                Point2 measurement = camera.project(points[j]);
+                gtsam::PinholeCamera<gtsam::Cal3DS2> camera(poses[i], *K);
+                gtsam::Point2 measurement = camera.project(points[j]);
                 log2DPoint(rec, measurement, i, "world/camera/image/projpoint" + std::to_string(j), 1);
 
                 /*std::vector<cv::Point2d> imgPts;
@@ -306,8 +306,8 @@ namespace selective_data {
                 cv::projectPoints(std::vector<cv::Point3d>(), rvec, tvec, intrinsicsMatrix, distCoeffs, imagePoints);
                 log2DPoint(rec, gtsam::Point2(imagePoints[0].x, imagePoints[0].y), i, "world/camera/image/CVprojpoint" + std::to_string(j), 0);*/
                 // Add measurement
-                /*graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3DS2>>(measurement, noise,
-                                                                                      Symbol('x', i), Symbol('l', j), K);*/
+                /*graph.emplace_shared<GenericProjectionFactor<Pose3, gtsam::Point3, Cal3DS2>>(measurement, noise,
+                                                                                      gtsam::Symbol('x', i), gtsam::Symbol('l', j), K);*/
             }
         // for (size_t i = 0; i < numPoses; ++i) {
             // Add factors for each landmark observation
@@ -325,20 +325,20 @@ namespace selective_data {
                     auto measurement = gtsam::Point2(corner.x, corner.y);
                     log2DPoint(rec, measurement, i, "world/camera/image/PnPpoint" + std::to_string(j), 3);
                     // Add measurement
-                    graph.emplace_shared<GenericProjectionFactor<Pose3, Point3, Cal3DS2>>(measurement, noise,
-                                                                                          Symbol('x', i), Symbol('l', j), K);
+                    graph.emplace_shared<gtsam::GenericProjectionFactor<gtsam::Pose3, gtsam::Point3, gtsam::Cal3DS2>>(measurement, noise,
+                                                                                          gtsam::Symbol('x', i), gtsam::Symbol('l', j), K);
                     j++;
                 }
             }
 
             // Intentionally initialize the variables off from the ground truth
-            // Pose3 noise(Rot3::Rodrigues(-0.1, 0.2, 0.25), Point3(0.05, -0.10, 0.20));
+            // Pose3 noise(Rot3::Rodrigues(-0.1, 0.2, 0.25), gtsam::Point3(0.05, -0.10, 0.20));
             // Pose3 initial_xi = poses[i].compose(noise);
 
 
             // Add an initial guess for the current pose
-            // initialEstimate.insert(Symbol('x', i), initial_xi);
-            initialEstimate.insert(Symbol('x', i), poses[i]);
+            // initialEstimate.insert(gtsam::Symbol('x', i), initial_xi);
+            initialEstimate.insert(gtsam::Symbol('x', i), poses[i]);
 
             // If this is the first iteration, add a prior on the first pose to set the coordinate frame
             // and a prior on the first landmark to set the scale
@@ -346,36 +346,36 @@ namespace selective_data {
             // adding it to iSAM.
             if (i == 0) {
                 // Add a prior on pose x0, with 30cm std on x,y,z 0.1 rad on roll,pitch,yaw
-                auto poseNoise = noiseModel::Diagonal::Sigmas(
-                  (Vector(6) << Vector3::Constant(0.1), Vector3::Constant(0.3)).finished());
-                graph.addPrior(Symbol('x', 0), poses[0], poseNoise);
+                auto poseNoise = gtsam::noiseModel::Diagonal::Sigmas(
+                  (gtsam::Vector(6) << gtsam::Vector3::Constant(0.1), gtsam::Vector3::Constant(0.3)).finished());
+                graph.addPrior(gtsam::Symbol('x', 0), poses[0], poseNoise);
 
                 // Add a prior on landmark l0
                 auto pointNoise =
-                  noiseModel::Isotropic::Sigma(3, 0.1);
-                graph.addPrior(Symbol('l', 0), points[0], pointNoise);
+                  gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
+                graph.addPrior(gtsam::Symbol('l', 0), points[0], pointNoise);
 
                 // Add initial guesses to all observed landmarks
-                // Point3 noise(-0.25, 0.20, 0.15);
+                // gtsam::Point3 noise(-0.25, 0.20, 0.15);
                 for (size_t j = 0; j < points.size(); ++j) {
                     log3DPoint(rec, points[j], i, "world/l" + std::to_string(j), 2);
                 // for (size_t j = 0; j < numLandmarks; ++j) {
                     // Intentionally initialize the variables off from the ground truth
-                    // Point3 initial_lj = points[j] + noise;
-                    // initialEstimate.insert(Symbol('l', j), initial_lj);
-                    initialEstimate.insert(Symbol('l', j), points[j]);
+                    // gtsam::Point3 initial_lj = points[j] + noise;
+                    // initialEstimate.insert(gtsam::Symbol('l', j), initial_lj);
+                    initialEstimate.insert(gtsam::Symbol('l', j), points[j]);
                 }
             }
             else {
                 // Update iSAM with the new factors
-                cout << "First update call\n";
+                std::cout << "First update call\n";
                 // isam.print("ISAM_)(*&^%^&*()_$%^&*()*&^%$^&*())(^&%$#$%^&*)()*&$%#$%^&*()&*^$%^#%$^&*(*(&^%$#%^&*^%#$%^&**&$^#%%$%&*&^%$#%$^%&*&*^$");
                 isam.update(graph, initialEstimate);
                 isam.update();
                 // Values currentEstimate = isam.estimate();
-                Values currentEstimate = isam.calculateEstimate();
-                cout << "****************************************************" << endl;
-                cout << "Frame " << i << ": " << endl;
+                gtsam::Values currentEstimate = isam.calculateEstimate();
+                std::cout << "****************************************************" << std::endl;
+                std::cout << "Frame " << i << ": " << std::endl;
                 currentEstimate.print("Current estimate: ");
                 // Clear the factor graph and values for the next iteration
                 graph.resize(0);

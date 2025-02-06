@@ -313,7 +313,7 @@ namespace LMslam {
         std::cout << "-----------------------------------------------------------------------------------------------------------------------------------------------\n\n";
         gtsam::LevenbergMarquardtParams param;
         param.verbosityLM = gtsam::LevenbergMarquardtParams::SUMMARY;
-        param.lambdaUpperBound = 1e10;
+        // param.lambdaUpperBound = 1e10;
         auto result = gtsam::LevenbergMarquardtOptimizer(graph, initialEstimate, param).optimize();
         result.print("Result");
 
