@@ -17,7 +17,7 @@
 
 /**
  * A structure-from-motion example with landmarks, default function arguments give
- *  - The landmarks form a 10 meter cube
+ *  - The landmarks form a 10-meter cube
  *  - The robot rotates around the landmarks, always facing towards the cube
  * Passing function argument allows to specificy an initial position, a pose increment and step count.
  */

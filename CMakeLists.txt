@@ -29,8 +29,8 @@ add_executable(gtsamExample GTSAMVisualISAMExample.cpp )
 # Download the rerun_sdk
 include(FetchContent)
 FetchContent_Declare(rerun_sdk URL
-        #https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip) # for the latest version of rerun
-        https://github.com/rerun-io/rerun/releases/download/0.17.0/rerun_cpp_sdk.zip) # for rerun 0.17
+        https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip) # for the latest version of rerun
+        #https://github.com/rerun-io/rerun/releases/download/0.17.0/rerun_cpp_sdk.zip) # for rerun 0.17
 FetchContent_MakeAvailable(rerun_sdk)
 
 

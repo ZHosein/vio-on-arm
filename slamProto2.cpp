@@ -129,14 +129,18 @@ namespace prototype2 {
             getCorners(image, ids, corners);
 
             cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
-            rec.log("world/camera/image",
+            /*rec.log("world/camera/image",
                     rerun::Image({
                                      static_cast<size_t>(image.rows),
                                      static_cast<size_t>(image.cols),
                                      static_cast<size_t>(image.channels())
                                  },
                                  reinterpret_cast<const uint8_t*>(image.data))
-            );
+            );*/
+            rec.log("world/camera/image",
+                    rerun::Image(reinterpret_cast<const uint8_t*>(image.data),
+                                 {static_cast<uint32_t>(image.cols), static_cast<uint32_t>(image.rows)}, // Cast to uint32_t
+                                 rerun::datatypes::ColorModel::RGB));
 
             // logging all corners as one point cloud
             std::vector<rerun::Position2D> corner_positions;
@@ -146,10 +150,9 @@ namespace prototype2 {
             rec.log("world/camera/image/corners",
                     rerun::Points2D(corner_positions).with_radii(4.0f));
 
-            gtsam::Pose3 wTc; // camera pose wrt wrld
-            
-            if (ids.size() > 2) {
-                // If this is the first iteration, add a prior on the first pose to set
+        if (ids.size() > 2) {
+            gtsam::Pose3 wTc;
+            // If this is the first iteration, add a prior on the first pose to set
                 // the coordinate frame and a prior on the first landmark to set the scale
                 // (and denote the first landmark as world)
                 if (observedTags.empty()) {
@@ -227,14 +230,14 @@ namespace prototype2 {
                         // rec.log("logs", rerun::TextLog(info).with_level(rerun::TextLogLevel::Trace));
 
 
-                        rec.log("world/marker" + std::to_string(ids[j]),
-                                rerun::Transform3D(
-                                    rerun::Vec3D(static_cast<Eigen::Vector3f>(
-                                            wTt.translation().matrix().cast<float>())
-                                        .data()),
-                                    rerun::Mat3x3(static_cast<Eigen::Matrix3f>(
-                                            wTt.rotation().matrix().cast<float>())
-                                        .data())));
+                            rec.log("world/marker" + std::to_string(ids[j]),
+                                    rerun::Transform3D(
+                                        rerun::Vec3D(static_cast<Eigen::Vector3f>(
+                                                wTt.translation().matrix().cast<float>())
+                                            .data()),
+                                        rerun::Mat3x3(static_cast<Eigen::Matrix3f>(
+                                                wTt.rotation().matrix().cast<float>())
+                                            .data())));
 
                         observedTags.insert({ids[j], {wTt, 0}});
                         std::cout << "For tag l" << ids[j] << std::endl;
@@ -243,8 +246,8 @@ namespace prototype2 {
                         wTt.print("wTt");
                         gtsam::Point3 initial_lj = wTt.transformFrom(
                             gtsam::Point3(0, 0, 0)); // coordiantes of top left crnr of tag TODO
-                        ptEstimates.push_back(rerun::Position3D(initial_lj.x(),initial_lj.y(),initial_lj.z()));
-
+                        // ptEstimates.push_back(rerun::Position3D(initial_lj.x(),initial_lj.y(),initial_lj.z()));
+                        ptEstimates.emplace_back(initial_lj.x(),initial_lj.y(),initial_lj.z());
                         /*std::vector<cv::Point2d> imgPts;
                         cv::projectPoints(cvPts, rvec, tvec, intrinsicsMatrix, distCoeffs, imgPts);
                         rec.set_time_sequence("Frame", 0);
@@ -284,8 +287,8 @@ namespace prototype2 {
                     gtsam::Point2 measurement =
                         gtsam::Point2(corners[j][0].x,
                                       corners[j][0].y); // only using top left crnr for now
-                    meansurments.push_back(rerun::Position2D(measurement.x(), measurement.y()));
-
+                    // meansurments.push_back(rerun::Position2D(measurement.x(), measurement.y()));
+                    meansurments.emplace_back(measurement.x(), measurement.y());
                     /*gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
                     // gtsam::Point2 projMeasure = camera.project(observedTags[ids[j]].pose);
                     log2DPoint(rec, measurement, i, "world/camera/image/projpoint" + std::to_string(j), 1);

@@ -175,13 +175,17 @@ namespace prototype {
             std::cout << "IDS:++++++++++++++++++++++++++++++++++++++++++++\n";
 
             cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
-            rec.log("world/camera/image",
+            /*rec.log("world/camera/image",
                     rerun::Image({
                                      static_cast<size_t>(image.rows),
                                      static_cast<size_t>(image.cols),
                                      static_cast<size_t>(image.channels())
                                  },
-                                 reinterpret_cast<const uint8_t*>(image.data)));
+                                 reinterpret_cast<const uint8_t*>(image.data)));*/
+            rec.log("world/camera/image",
+                    rerun::Image(reinterpret_cast<const uint8_t*>(image.data),
+                                 {static_cast<uint32_t>(image.cols), static_cast<uint32_t>(image.rows)}, // Cast to uint32_t
+                                 rerun::datatypes::ColorModel::RGB));
 
             // logging all corners as one point cloud
             std::vector<rerun::Position2D> corner_positions;
@@ -194,9 +198,7 @@ namespace prototype {
 
             gtsam::Values currentEstimate = isam.estimate();
 
-            gtsam::Pose3 wTc; // camera pose wrt wrld
-
-            // only using top left corner for now (point 0) of each tag; using all
+        // only using top left corner for now (point 0) of each tag; using all
             // corners may be better
             // TODO: must also check that if only one tag is present that that tag is
             // world (or no world chosen yet) [could also just simply ignore frames with
@@ -204,6 +206,7 @@ namespace prototype {
             // seen before if (!ids.empty()) {
             // if (ids.size() >= 2) {
             if (ids.size() > 2) {
+                gtsam::Pose3 wTc;
                 // If this is the first iteration, add a prior on the first pose to set
                 // the coordinate frame and a prior on the first landmark to set the scale
                 // (and denote the first landmark as world) Also, as iSAM solves
@@ -372,8 +375,8 @@ namespace prototype {
                         wTt.print("wTt");
                         gtsam::Point3 initial_lj = wTt.transformFrom(
                             gtsam::Point3(0, 0, 0)); // coordiantes of top left crnr of tag TODO
-                        ptEstimates.push_back(rerun::Position3D(initial_lj.x(),initial_lj.y(),initial_lj.z()));
-
+                        // ptEstimates.push_back(rerun::Position3D(initial_lj.x(),initial_lj.y(),initial_lj.z()));
+                        ptEstimates.emplace_back(initial_lj.x(),initial_lj.y(),initial_lj.z());
                         /*std::vector<cv::Point2d> imgPts;
                         cv::projectPoints(cvPts, rvec, tvec, intrinsicsMatrix, distCoeffs, imgPts);
                         rec.set_time_sequence("Frame", 0);
@@ -413,7 +416,8 @@ namespace prototype {
                     gtsam::Point2 measurement =
                         gtsam::Point2(corners[j][0].x,
                                       corners[j][0].y); // only using top left crnr for now
-                    meansurments.push_back(rerun::Position2D(measurement.x(), measurement.y()));
+                    // meansurments.push_back(rerun::Position2D(measurement.x(), measurement.y()));
+                    meansurments.emplace_back(measurement.x(), measurement.y());
 
                     /*gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
                     // gtsam::Point2 projMeasure = camera.project(observedTags[ids[j]].pose);

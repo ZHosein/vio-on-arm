@@ -93,9 +93,15 @@ void detectPoseLog () {
     //                          ---------------  logging image---------------
 
 
-    rec.log("world/camera/image",
-            rerun::Image({static_cast<size_t>(image.rows), static_cast<size_t>(image.cols), static_cast<size_t>(image.channels())}, reinterpret_cast<const uint8_t*>(image.data)));
+    // rec.log("world/camera/image",
+    //         rerun::Image({static_cast<size_t>(image.rows), static_cast<size_t>(image.cols), static_cast<size_t>(image.channels())}, reinterpret_cast<const uint8_t*>(image.data)));
 
+    rec.log("world/camera/image",
+        rerun::Image(
+            reinterpret_cast<const uint8_t*>(image.data),  // Raw pixel data first
+            {static_cast<uint32_t>(image.cols), static_cast<uint32_t>(image.rows)},  // Dimensions
+            rerun::datatypes::ColorModel::RGB  // Explicitly specify color model
+        ));
 
 
     //                         ---------------  logging corners ---------------
@@ -121,7 +127,8 @@ void detectPoseLog () {
             rotVals.at(j) = static_cast<float>(rotMatTrans.at<double>(j));
         }
         rerun::Mat3x3 rot(rotVals);
-        rerun::Vec3D trans(tvecs[i][0], tvecs[i][1], tvecs[i][2]);
+        // rerun::Vec3D trans(tvecs[i][0], tvecs[i][1], tvecs[i][2]);
+        rerun::Vec3D trans(static_cast<float>(tvecs[i][0]), static_cast<float>(tvecs[i][1]), static_cast<float>(tvecs[i][2]));
 
         rec.log(
             "world/marker" + std::to_string(ids[i]),
