@@ -8,7 +8,7 @@
 #include "rerun.hpp"
 
 
-// std::string imgPath = "OAK_DICT_4x4_50_1080p.jpeg";
+//std::string imgPath = "OAK_DICT_4x4_50_1080p.jpeg";
 std::string imgPath = "OAK_DICT_4x4_50_1080p_obstructed.jpeg";
 auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
@@ -63,7 +63,8 @@ void detectPose () {
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);     // Rerun expects RGB format
 
     const auto rec = rerun::RecordingStream("Image pose");
-    auto result = rec.connect("10.0.0.2:9876");
+    //auto result = rec.connect_tcp("10.0.0.2:9876");    <<--- not my ip, but correct port
+    auto result = rec.connect_tcp("192.168.0.8:9876");   //<<--- my ip, correct port. swap mines out for yours, whoever using it
     if (result.is_err()) {
         std::cout << "Failed to connect to rerun viewer";
         exit(1);
@@ -89,8 +90,30 @@ void detectPose () {
     //                          ---------------  logging image---------------
 
 
+    // rec.log("world/camera/image",
+    //         rerun::Image({image.rows, image.cols, image.channels()}, reinterpret_cast<const uint8_t*>(image.data)));
+
+    // // Convert BGR to RGB using OpenCV (if needed)
+    // cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    //
+    // // Log the image to Rerun
+    // rec.log("world/camera/image",
+    //         rerun::Image({image.rows, image.cols, image.channels()},
+    //                      reinterpret_cast<const uint8_t*>(image.data)));
+
+    //rec.log("world/camera/image",
+        //rerun::Image({image.rows, image.cols, image.channels()},
+           //          rerun::components::ImageFormat::RGB, // Explicit format
+            //         reinterpret_cast<const uint8_t*>(image.data)));
+    // Convert BGR to RGB using OpenCV
+    cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+
+    // Log the image to Rerun
     rec.log("world/camera/image",
-            rerun::Image({image.rows, image.cols, image.channels()}, reinterpret_cast<const uint8_t*>(image.data)));
+            rerun::Image(reinterpret_cast<const uint8_t*>(image.data),
+                         {static_cast<uint32_t>(image.cols), static_cast<uint32_t>(image.rows)}, // Cast to uint32_t
+                         rerun::datatypes::ColorModel::RGB));
+
 
 
 
@@ -117,7 +140,8 @@ void detectPose () {
             rotVals.at(j) = static_cast<float>(rotMatTrans.at<double>(j));
         }
         rerun::Mat3x3 rot(rotVals);
-        rerun::Vec3D trans(tvecs[i][0], tvecs[i][1], tvecs[i][2]);
+        //rerun::Vec3D trans(tvecs[i][0], tvecs[i][1], tvecs[i][2]);
+        rerun::Vec3D trans(static_cast<float>(tvecs[i][0]), static_cast<float>(tvecs[i][1]), static_cast<float>(tvecs[i][2]));
 
         rec.log(
             "world/marker" + std::to_string(ids[i]),
