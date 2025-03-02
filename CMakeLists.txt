@@ -3,9 +3,9 @@ project(IMX)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package( OpenCV REQUIRED)
+find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-
+#include_directories(opencv/modules/core/include)
 
 add_executable(IMX main.cpp)
 

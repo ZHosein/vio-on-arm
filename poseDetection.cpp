@@ -19,6 +19,7 @@ cv::Mat distCoeffs = (cv::Mat_<float>(1, 14) << 2.0888574, -82.303825, -0.000713
 
 void detectPose () {
     cv::Mat image = cv::imread(imgPath, cv::IMREAD_COLOR);
+
     if(!image.data) {
         std::cout << "Could not find image " + imgPath;
         exit(1);
