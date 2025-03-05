@@ -44,13 +44,13 @@ if [ ! -d arrow ]; then
     cd ../../..
 fi
 
-if [! -d rerun ]; then
-    git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
-    cd rerun && \
-    mkdir "build" && cd build && \
-    cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
-        -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/lib/cmake/arrow \
-        -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j $(nproc) && make install
-    cd ../..
-fi
+#if [! -d rerun ]; then
+#    git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
+#    cd rerun && \
+#    mkdir "build" && cd build && \
+#    cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
+#        -DCMAKE_BUILD_TYPE=Release \
+#        -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+#    make -j $(nproc) && make install
+#    cd ../..
+#fi
