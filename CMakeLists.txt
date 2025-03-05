@@ -9,11 +9,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(IMX main.cpp)
 
+# rerun installed from script previously installed
+find_package(rerun REQUIRED)
 # Download the rerun_sdk
-include(FetchContent)
-FetchContent_Declare(rerun_sdk URL
+#include(FetchContent)
+#FetchContent_Declare(rerun_sdk URL
         https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip)
-FetchContent_MakeAvailable(rerun_sdk)
+#FetchContent_MakeAvailable(rerun_sdk)
 
 
 target_link_libraries(IMX PRIVATE ${OpenCV_LIBS} rerun_sdk)

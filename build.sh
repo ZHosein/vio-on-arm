@@ -36,10 +36,21 @@ if [ ! -d arrow ]; then
     cd arrow/cpp && \
     mkdir "build" && cd build && \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
-        -DCMAKE_BUILD_TYPE=Debug -DARROW_BUILD_STATIC=ON -DARROW_DEPENDENCY_SOURCE=BUNDLED \
+        -DCMAKE_BUILD_TYPE=Release -DARROW_BUILD_STATIC=ON -DARROW_DEPENDENCY_SOURCE=BUNDLED \
         -DARROW_ENABLE_THREADING=OFF -DARROW_FLIGHT=OFF -DARROW_JEMALLOC=OFF -DARROW_MIMALLOC=OFF -DARROW_BUILD_SHARED=OFF \
         -DCMAKE_INSTALL_PREFIX=/usr/local \
         .. && \
     make -j $(nproc) && make install
     cd ../../..
+fi
+
+if [! -d rerun ]; then
+    git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
+    cd rerun && \
+    mkdir "build" && cd build && \
+    cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+    make -j $(nproc) && make install
+    cd ../..
 fi
