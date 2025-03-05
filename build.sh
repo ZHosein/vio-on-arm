@@ -3,6 +3,10 @@
 # shell script command: bash build.sh
 export TZ=${TZ:-Etc/UTC}
 export DIRPATH=${DIRPATH:-/root}
+export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc
+export CARGO_TARGET=aarch64-unknown-linux-gnu
+#you can place the above 4 lines at the end of your .bashrc file
+
 CURRENT_DIR=$(pwd)
 if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
     cp -r ./* $DIRPATH/
@@ -48,6 +52,7 @@ if [! -d rerun ]; then
     git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     source $HOME/.cargo/env
+    rustup target add aarch64-unknown-linux-gnu
     cd rerun && \
     mkdir -p build && cd build && \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
