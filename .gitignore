@@ -34,3 +34,5 @@
 # Custom
 build
 *.tar.gz
+opencv
+arrow

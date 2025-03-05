@@ -1,4 +1,13 @@
-# docker build -t vio-on-arm-imx
+# user required: root (sudo su -)
+# docker command: docker build -t vio-on-arm-imx
+# shell script command: bash build.sh
+DIRPATH=${DIRPATH:-/root}
+CURRENT_DIR=$(pwd)
+if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
+    cp -r ./* $DIRPATH/
+    cd $DIRPATH
+    rm -rf $CURRENT_DIR
+fi
 apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt upgrade -y
 apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
