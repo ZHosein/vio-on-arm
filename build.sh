@@ -22,7 +22,7 @@ if [ ! -d opencv ]; then
 fi
 
 if [ ! -d arrow ]; then
-    git clone --depth=1 https://github.com/apache/arrow.git
+    git clone --branch apache-arrow-19.0.1 --depth=1 https://github.com/apache/arrow.git
     cd arrow/cpp && \
     mkdir "build" && cd build && \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
