@@ -46,6 +46,8 @@ fi
 
 if [! -d rerun ]; then
     git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    source $HOME/.cargo/env
     cd rerun && \
     mkdir "build" && cd build && \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
