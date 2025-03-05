@@ -49,7 +49,7 @@ if [! -d rerun ]; then
     cd rerun && \
     mkdir "build" && cd build && \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_BUILD_TYPE=Release -DArrow_DIR=/usr/local/lib/cmake/arrow \
         -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
     make -j $(nproc) && make install
     cd ../..
