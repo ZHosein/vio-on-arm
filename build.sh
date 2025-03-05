@@ -18,7 +18,7 @@ if [ ! -d opencv ]; then
         ../../.. && \
     make -j $(nproc) && \
     make install
-    cd ../../..
+    cd ../../../..
 fi
 
 if [ ! -d arrow ]; then
@@ -31,5 +31,5 @@ if [ ! -d arrow ]; then
         -DCMAKE_INSTALL_PREFIX=/usr/local \
         .. && \
     make -j $(nproc) && make install
-    cd ../..
+    cd ../../..
 fi
