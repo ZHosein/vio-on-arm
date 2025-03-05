@@ -1,7 +1,8 @@
 # user required: root (sudo su -)
 # docker command: docker build -t vio-on-arm-imx
 # shell script command: bash build.sh
-DIRPATH=${DIRPATH:-/root}
+export TZ=${TZ:-Etc/UTC}
+export DIRPATH=${DIRPATH:-/root}
 CURRENT_DIR=$(pwd)
 if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
     cp -r ./* $DIRPATH/
