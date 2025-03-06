@@ -53,19 +53,19 @@ if [ ! -d arrow ]; then
     cd ../../..
 fi
 
-if [ ! -d rerun ]; then
-    git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    source $HOME/.cargo/env
-    rustup target add aarch64-unknown-linux-gnu
-    cd rerun && \
-    mkdir -p build && cd build && \
-    cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
-        -DCMAKE_BUILD_TYPE=Release -DRERUN_DOWNLOAD_AND_BUILD_ARROW=OFF \
-        -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j $(nproc) && make install
-    cd ../..
-fi
+# if [ ! -d rerun ]; then
+#     git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
+#     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#     source $HOME/.cargo/env
+#     rustup target add aarch64-unknown-linux-gnu
+#     cd rerun && \
+#     mkdir -p build && cd build && \
+#     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
+#         -DCMAKE_BUILD_TYPE=Release -DRERUN_DOWNLOAD_AND_BUILD_ARROW=OFF \
+#         -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+#     make -j $(nproc) && make install
+#     cd ../..
+# fi
 
 mkdir -p build && cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
