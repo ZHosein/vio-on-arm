@@ -17,7 +17,7 @@ if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
 fi
 apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt upgrade -y
 apt-get update -y && apt-get install -y git cmake tzdata
-apt install -y wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
     binutils-aarch64-linux-gnu gdb-multiarch
 
 # Cross Compiling OpenCV (to /usr/local - this path is already in the dynamic linker by default
