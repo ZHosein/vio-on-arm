@@ -50,7 +50,7 @@ if [ ! -d arrow ]; then
     cd ../../..
 fi
 
-if [! -d rerun ]; then
+if [ ! -d rerun ]; then
     git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     source $HOME/.cargo/env
