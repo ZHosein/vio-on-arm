@@ -4,8 +4,10 @@
 export TZ=${TZ:-Etc/UTC}
 export DIRPATH=${DIRPATH:-/root}
 export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc
+export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
+export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
 export CARGO_TARGET=aarch64-unknown-linux-gnu
-#you can place the above 4 lines at the end of your .bashrc file
+#you can place the above lines at the end of your .bashrc file
 
 CURRENT_DIR=$(pwd)
 if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
