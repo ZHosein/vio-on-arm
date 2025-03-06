@@ -3,6 +3,8 @@ set(CMAKE_SYSTEM_PROCESSOR arm64)
 
 set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++)
+set(CMAKE_AR /usr/bin/aarch64-linux-gnu-ar)
+set(CMAKE_LINKER /usr/bin/aarch64-linux-gnu-ld)
 
 set(RUST_TARGET "aarch64-unknown-linux-gnu")
 set(CARGO_TARGET_AARCH64_LINUX_GNU_LINKER /usr/bin/aarch64-linux-gnu-gcc)

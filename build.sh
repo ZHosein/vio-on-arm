@@ -7,6 +7,8 @@ export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-
 export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
 export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
 export CARGO_TARGET=aarch64-unknown-linux-gnu
+export AR=aarch64-linux-gnu-ar
+export LD=aarch64-linux-gnu-ld
 #you can place the above lines at the end of your .bashrc file
 
 CURRENT_DIR=$(pwd)
