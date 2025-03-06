@@ -3,14 +3,14 @@
 # shell script command: bash build.sh
 export TZ=${TZ:-Etc/UTC}
 export DIRPATH=${DIRPATH:-/root}
-export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc
-export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
-export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
+export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc-10
+export CC_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-gcc-10
+export CXX_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-g++-10
 export CARGO_TARGET=aarch64-unknown-linux-gnu
-export AR=aarch64-linux-gnu-ar
-export LD=aarch64-linux-gnu-ld
+export AR=/usr/bin/aarch64-linux-gnu-ar
+export LD=/usr/bin/aarch64-linux-gnu-ld
 export PATH="$HOME/.cargo/bin:$PATH"
-export RUSTFLAGS="-C linker=aarch64-linux-gnu-gcc"
+export RUSTFLAGS="-C linker=/usr/bin/aarch64-linux-gnu-gcc-10"
 #you can place the above lines at the end of your .bashrc file
 
 CURRENT_DIR=$(pwd)
@@ -23,6 +23,7 @@ apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt
 apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
     binutils-aarch64-linux-gnu gdb-multiarch
+apt install -y gcc-10-aarch64-linux-gnu g++-10-aarch64-linux-gnu gcc-10 g++-10
 
 # Cross Compiling OpenCV (to /usr/local - this path is already in the dynamic linker by default
 if [ ! -d opencv_contrib ]; then
@@ -74,3 +75,6 @@ cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
     -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
 make -j $(nproc)
 cd ..
+
+# after, run this command and make sure it's 3.4.29 or under:
+# objdump -T build/IMX | grep GLIBCXX

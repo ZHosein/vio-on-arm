@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22.1)
 project(IMX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_COMPILER "/usr/bin/aarch64-linux-gnu-gcc-10")
+set(CMAKE_CXX_COMPILER "/usr/bin/aarch64-linux-gnu-g++-10")
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
