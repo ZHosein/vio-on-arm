@@ -9,6 +9,7 @@ export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
 export CARGO_TARGET=aarch64-unknown-linux-gnu
 export AR=aarch64-linux-gnu-ar
 export LD=aarch64-linux-gnu-ld
+export PATH="$HOME/.cargo/bin:$PATH"
 #you can place the above lines at the end of your .bashrc file
 
 CURRENT_DIR=$(pwd)
