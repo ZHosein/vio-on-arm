@@ -68,5 +68,5 @@ mkdir -p build && cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-make -j $(nproc) && make install
+make -j $(nproc)
 cd ..
