@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.22.1)
 project(IMX)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 set(CMAKE_C_COMPILER "/usr/bin/aarch64-linux-gnu-gcc-8")
 set(CMAKE_CXX_COMPILER "/usr/bin/aarch64-linux-gnu-g++-8")
 
@@ -33,4 +32,3 @@ FetchContent_MakeAvailable(rerun_sdk)
 
 
 target_link_libraries(IMX PRIVATE ${OpenCV_LIBS} rerun_sdk)
-target_link_options(IMX PRIVATE -static -static-libgcc -static-libstdc++)
