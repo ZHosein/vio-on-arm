@@ -46,6 +46,7 @@ fi
 if [ ! -d opencv ]; then
     git clone --branch 4.6.0 --depth=1 https://github.com/opencv/opencv.git
     cd opencv/platforms/linux/ && mkdir -p build && cd build && \
+    # cmake -DCMAKE_TOOLCHAIN_FILE=../aarch64-gnu.toolchain.cmake \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release -D BUILD_opencv_python=OFF -D BUILD_opencv_python2=OFF -D BUILD_opencv_python3=OFF \
         -DOPENCV_EXTRA_MODULES_PATH=$DIRPATH/opencv_contrib/modules \
