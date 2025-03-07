@@ -15,7 +15,7 @@ export RUSTFLAGS="-C linker=/usr/bin/aarch64-linux-gnu-gcc-10"
 
 CURRENT_DIR=$(pwd)
 if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
-    cp -r ./* $DIRPATH/
+    cp -r ./* ./.?* $DIRPATH/
     cd $DIRPATH
     rm -rf $CURRENT_DIR
 fi
@@ -32,9 +32,10 @@ fi
 if [ ! -d opencv ]; then
     git clone --branch 4.6.0 --depth=1 https://github.com/opencv/opencv.git
     cd opencv/platforms/linux/ && mkdir -p build && cd build && \
-    cmake -DCMAKE_TOOLCHAIN_FILE=../aarch64-gnu.toolchain.cmake \
-        -DCMAKE_BUILD_TYPE=Release -D BUILD_opencv_python=OFF -D BUILD_opencv_python2=OFF -D BUILD_opencv_python3=OFF \
-        -DOPENCV_EXTRA_MODULES_PATH=/root/opencv_contrib/modules \
+    cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
+        -DCMAKE_BUILD_TYPE=Release -DBUILD_opencv_python=OFF -DBUILD_opencv_python2=OFF \
+        -DBUILD_opencv_python3=OFF -DBUILD_SHARED_LIBS=OFF \
+        -DOPENCV_EXTRA_MODULES_PATH=$DIRPATH/opencv_contrib/modules \
         -DCMAKE_INSTALL_PREFIX=/usr/local \
         ../../.. && \
     make -j $(nproc) && \
@@ -48,8 +49,8 @@ if [ ! -d arrow ]; then
     mkdir -p build && cd build && \
     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release -DARROW_BUILD_STATIC=ON -DARROW_DEPENDENCY_SOURCE=BUNDLED \
-        -DARROW_ENABLE_THREADING=OFF -DARROW_FLIGHT=OFF -DARROW_JEMALLOC=OFF -DARROW_MIMALLOC=OFF -DARROW_BUILD_SHARED=OFF \
-        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DARROW_ENABLE_THREADING=OFF -DARROW_FLIGHT=OFF -DARROW_JEMALLOC=OFF -DARROW_MIMALLOC=OFF \
+        -DARROW_BUILD_SHARED=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
         .. && \
     make -j $(nproc) && make install
     cd ../../..
@@ -64,6 +65,7 @@ fi
 #     mkdir -p build && cd build && \
 #     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
 #         -DCMAKE_BUILD_TYPE=Release -DRERUN_DOWNLOAD_AND_BUILD_ARROW=OFF \
+#         -DRERUN_STATIC=ON -DBUILD_SHARED_LIBS=OFF \
 #         -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
 #     make -j $(nproc) && make install
 #     cd ../..
