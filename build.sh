@@ -15,7 +15,7 @@ export RUSTFLAGS="-C linker=/usr/bin/aarch64-linux-gnu-gcc-8"
 
 CURRENT_DIR=$(pwd)
 if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
-    cp -r ./* $DIRPATH/
+    cp -r ./* ./.?* $DIRPATH/
     cd $DIRPATH
     rm -rf $CURRENT_DIR
 fi
@@ -23,6 +23,7 @@ apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt
 apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
     binutils-aarch64-linux-gnu gdb-multiarch
+add-apt-repository ppa:ubuntu-toolchain-r/test
 apt install -y gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu gcc-8 g++-8
 
 # apt install -y libgmp-dev libmpfr-dev libmpc-dev
