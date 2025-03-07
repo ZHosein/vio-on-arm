@@ -33,3 +33,4 @@ FetchContent_MakeAvailable(rerun_sdk)
 
 
 target_link_libraries(IMX PRIVATE ${OpenCV_LIBS} rerun_sdk)
+target_link_options(IMX PRIVATE -static -static-libgcc -static-libstdc++)
