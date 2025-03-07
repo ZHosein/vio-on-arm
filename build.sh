@@ -24,7 +24,8 @@ apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
     binutils-aarch64-linux-gnu gdb-multiarch
 add-apt-repository ppa:ubuntu-toolchain-r/test
-apt install -y gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu gcc-8 g++-8
+apt install -y gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu gcc-8 g++-8 --fix-missing
+apt --fix-broken -y install
 
 # apt install -y libgmp-dev libmpfr-dev libmpc-dev
 # wget http://ftp.gnu.org/gnu/gcc/gcc-8.5.0/gcc-8.5.0.tar.gz
