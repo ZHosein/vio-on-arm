@@ -7,7 +7,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/aarch64-linux-gnu-g++-8")
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-#include_directories(opencv/modules/core/include)
+include_directories(opencv/modules/core/include)
 
 add_executable(IMX main.cpp)
 
