@@ -22,9 +22,15 @@ include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GTSAM_INCLUDE_
 add_executable(Dev main.cpp
         rerunLogger.h
         opencvProjTest.h
-        opencvProjTest.cpp)
+        opencvProjTest.cpp
+)
+#        experiments/LMOptimize.cpp
+#        experiments/expeimentData.cpp)
 
-add_executable(gtsamExample GTSAMVisualISAMExample.cpp )
+
+
+#add_executable(gtsamExample GTSAMVisualISAMExample.cpp )
+add_executable(gtsamExample "GTSAM Examples/factorGraphs.cpp" )
 
 # Download the rerun_sdk
 include(FetchContent)
