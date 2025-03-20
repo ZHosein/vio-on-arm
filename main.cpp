@@ -1,29 +1,14 @@
 #include <iostream>
 
-#include "markerDetection.cpp"
-#include "poseDetection.cpp"
-#include "poseDetectionRerunLogging.cpp"
-#include "LogPoseAprilTagsVid.cpp"
-
-#include "VSLAM.h"
-#include "slamProto.cpp"
-#include "GTSAMviSAMExample2.cpp"
-#include "selectiveDataTest.cpp"
-
-#include "opencvProjTest.h"
-
-#include "slamProto2.cpp"
+#include "expeimentData.h"
 
 int main() {
+
     std::cout << "Hello, World!" << std::endl;
-
-
     /*opencvProjTest test{};
     test.TestOneImage();
     */
-
-
-    prototype2::slam();
+    // prototype2::slam();
     // prototype::slam();
     // detectPoseVid();
     /*
@@ -45,7 +30,6 @@ int main() {
     // selective_data::createPoses();
     // std::cout << "====================================SLAM+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
     // selective_data::slam();
-
     std::cout << "END" << std::endl;
     return 0;
 }
