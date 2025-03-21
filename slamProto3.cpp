@@ -22,6 +22,7 @@
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 
 #include <rerun.hpp>
+#include <gtsam/slam/BetweenFactor.h>
 
 #include "rerunLogger.h"
 #include "expeimentData.h"
@@ -34,17 +35,16 @@ namespace prototype3 {
 
         gtsam::NonlinearISAM isam{};
 
-        gtsam::NonlinearFactorGraph newLandmarksGraph; // projFactors for new landmarks waiting to be observed twice
-        gtsam::NonlinearFactorGraph reobservedLandmarksGraph; // projFactors for observed landmarks; added to iSAM on every update
-        gtsam::NonlinearFactorGraph poseGraph; // (visual) odometry factors for cam poses; added to iSAM on every update
-        gtsam::Values poseEstimates;
-        gtsam::Values newLandmarkEstimates;
+        gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
+        gtsam::Values valueEstimates;
 
         int worldTagID;
         int poseNum = 0;
+        gtsam::Pose3 prev_wTc;
         std::map<int, Tag> observedTags;
-
-        for (int frame = 45; frame <= 53; frame++) {
+        // 3 tags alone: 45-53
+        // 45-59 no crash
+        for (int frame = 45; frame <= 629; frame++) {
             cv::Mat image = getCVImage(static_cast<int>(frame));
 
             std::vector<int> ids;
@@ -64,33 +64,43 @@ namespace prototype3 {
                     cv::solvePnP(objPoints, corners[0], intrinsicsMatrix, distCoeffs, rvec,tvec);
                     gtsam::Pose3 cTw(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
                     wTc = cTw.inverse(); // pose of camera wrt world
+                    prev_wTc = wTc;
 
-                    // Add a prior on pose x0, with 30cm std on x,y,z 0.1 rad on roll,pitch,yaw
-                    auto poseNoise = gtsam::noiseModel::Diagonal::Sigmas((gtsam::Vector(6) << gtsam::Vector3::Constant(0.1),gtsam::Vector3::Constant(0.1)).finished());
-                    poseGraph.addPrior(gtsam::Symbol('x', poseNum), wTc,poseNoise);
+                    // Add a prior on pose x0, with 30cm std on x,y,z 0.1 rad on roll,pitch,yaw (see experimentData for noise model)
+                    factorGraph.addPrior(gtsam::Symbol('x', poseNum), wTc, poseNoise);
 
                     // Add a prior on landmark l0
                     auto pointNoise = gtsam::noiseModel::Isotropic::Sigma(3, 0.01);
-                    newLandmarksGraph.addPrior(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0),pointNoise);
+                    factorGraph.addPrior(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0),pointNoise);
 
                     // add estimate for landmark l0
-                    newLandmarkEstimates.insert(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0));
+                    valueEstimates.insert(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0));
                 } else {
                     for (int j = 0; j < ids.size(); ++j) {
                         // calc wTc (camera pose wrt world)
                         if (observedTags.count(ids[j]) == 1) { // tag was seen before and we know its pose wrt world
-                            gtsam::Pose3 wTt = observedTags[ids[j]].pose; // pose of tag wrt wrld (transforms pts in tag crdnt frm to world)
+                            gtsam::Pose3 wTt = observedTags[ids[j]].pose;
+                            // pose of tag wrt wrld (transforms pts in tag crdnt frm to world)
                             cv::Vec3d rvec, tvec;
                             cv::solvePnP(objPoints, corners[j], intrinsicsMatrix, distCoeffs, rvec, tvec);
-                            gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
+                            gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)), gtsam::Point3(tvec.val));
                             wTc = wTt.compose(cTt.inverse()); // pose of cam wrt world
+
+                            // calc odometry (pTc: curr cam pose wrt prev cam pose); add to graph
+                            auto wTp = prev_wTc;
+                            gtsam::Pose3 pTc = wTp.inverse().compose(wTc); // pTw * wTc
+
+                            factorGraph.add(gtsam::BetweenFactor<gtsam::Pose3>(
+                                gtsam::Symbol('x', poseNum - 1), gtsam::Symbol('x', poseNum), pTc, poseNoise));
+                            prev_wTc = wTc;
+
                             break;
                         }
                     }
                 }
 
                  // Add an initial guess for the current camera pose
-                poseEstimates.insert(gtsam::Symbol('x', poseNum), wTc);
+                valueEstimates.insert(gtsam::Symbol('x', poseNum), wTc);
 
                 // Add initial guesses to all newly observed landmarks
                 for (size_t j = 0; j < ids.size(); ++j) {
@@ -103,39 +113,38 @@ namespace prototype3 {
                         observedTags.insert({ids[j], {wTt, 0}});
                         gtsam::Point3 initial_lj = wTt.transformFrom(gtsam::Point3(0, 0, 0)); // coordinates of top left corner of tag
 
-                        // get cam pose wrt world; get pts wrt world; add to graph (deal with x2 sighting later)
-                        poseEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
+                        // get cam pose wrt world; get pts wrt world; add to graph
+                        valueEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
                     }
                 }
 
-
-                // Add factors for each landmark observation
+                // Add factors for each landmark observation (reobserved and new)
                 for (size_t j = 0; j < ids.size(); ++j) {
                     observedTags[ids[j]].count += 1;
                     gtsam::Point2 measurement = gtsam::Point2(corners[j][0].x, corners[j][0].y); // top left corner
-                    newLandmarksGraph.emplace_shared<gtsam::GenericProjectionFactor<
+                    factorGraph.emplace_shared<gtsam::GenericProjectionFactor<
                         gtsam::Pose3, gtsam::Point3, gtsam::Cal3DS2>>(
                         measurement, noise, gtsam::Symbol('x', poseNum),
                         gtsam::Symbol('l', ids[j]), K);
                 }
 
-                // Update iSAM with the new factors
-                bool update = false;
-                for (int id : ids) if (observedTags[id].count < 2) update = true;
+                // Update iSAM with the new factors and values ONLY if all landmarks in this frame have been observed at least x2.
+                bool update = true;
+                for (int id : ids) if (observedTags[id].count < 2) update = false;
                 if(update) {
                     // newLandmarksGraph.print("***********************************GRAPH***********************************");
                     // std::cout << "Updating iSAM...\n";
                     // isam.print();
                     // isam.printStats();
-                    isam.update(newLandmarksGraph, poseEstimates);
+                    isam.update(factorGraph, valueEstimates);
                     // isam.saveGraph("graph.txt");
                     gtsam::Values currentEstimate = isam.estimate();
                     std::cout << "****************************************************" << std::endl;
                     std::cout << "Frame " << frame << ": " << std::endl;
                     currentEstimate.print("Current estimate: ");
                     // Clear the factor graph and values for the next iteration
-                    newLandmarksGraph.resize(0);
-                    poseEstimates.clear();
+                    factorGraph.resize(0);
+                    valueEstimates.clear();
                 }
                 poseNum++;
             }

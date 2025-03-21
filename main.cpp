@@ -1,10 +1,9 @@
 #include <iostream>
-
-#include "expeimentData.h"
+#include "slamProto3.cpp"
 
 int main() {
-
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Start" << std::endl;
+    prototype3::slam();
     /*opencvProjTest test{};
     test.TestOneImage();
     */

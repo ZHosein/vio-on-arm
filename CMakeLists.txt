@@ -20,11 +20,11 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GTSAM_INCLUDE_DIR})
 
 add_executable(Dev main.cpp
-        rerunLogger.h
+#        rerunLogger.h
 #        opencvProjTest.h
 #        opencvProjTest.cpp
-        expeimentData.h
-        slamProto3.cpp
+#        expeimentData.h
+#        slamProto3.cpp
 )
 #        experiments/LMOptimize.cpp
 #        experiments/expeimentData.h)

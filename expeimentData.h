@@ -21,8 +21,8 @@
 
 namespace experiments {
     // inline std::string dirPath = std::string(XSTRING(SOURCE_ROOT)).append("/original order/vid_APRILTAG_36h11_720p/");
-    inline std::string dirPath = std::string(XSTRING(SOURCE_ROOT)).append("/roomMap");
-    inline float markerLength = 0.111;
+    inline std::string dirPath = std::string(XSTRING(SOURCE_ROOT)).append("/roomMap/");
+    inline float markerLength = 0.111; // metres (i.e., ~11.1cm)
 
     inline cv::Mat intrinsicsMatrix = (cv::Mat_<double>(3, 3) <<
         1025.26513671875, 0.0, 642.6650390625,
@@ -55,6 +55,8 @@ namespace experiments {
 
     // Define the camera observation noise model
     inline auto noise = gtsam::noiseModel::Isotropic::Sigma(2, 1.0); // one pixel in u and v
+    inline auto poseNoise = gtsam::noiseModel::Diagonal::Sigmas((gtsam::Vector(6) << gtsam::Vector3::Constant(0.1),gtsam::Vector3::Constant(0.1)).finished());
+
 
     inline cv::Mat objPoints(4, 1, CV_32FC3);
 
