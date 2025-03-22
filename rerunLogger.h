@@ -41,7 +41,8 @@ inline void logCVImage(const rerun::RecordingStream& rec, const cv::Mat& image, 
 }
 
 inline void log2DPoint(const rerun::RecordingStream& rec, const gtsam::Point2& point, const int frameNum, const std::string& entity, int color=1) {
-    rerun::Color c;
+    rec.set_time_sequence("Frame", frameNum);
+    rerun::Color c{};
     switch (color) {
     case 0:
         c = rerun::Color(0, 0, 0);
@@ -56,14 +57,14 @@ inline void log2DPoint(const rerun::RecordingStream& rec, const gtsam::Point2& p
             c = rerun::Color(255, 255, 255); break;
     }
 
-    rec.set_time_sequence("Frame", frameNum);
     // rec.log(entity, rerun::Position2D(point.x(), point.y()));
     std::vector<rerun::Position2D> points = {rerun::Position2D(point.x(), point.y())};
     rec.log(entity, rerun::Points2D(points).with_colors(c).with_radii(5.0f));
 }
 
 inline void log3DPoint(const rerun::RecordingStream& rec, const gtsam::Point3& point, const int frameNum, const std::string& entity, const int color=1) {
-    rerun::Color c;
+    rec.set_time_sequence("Frame", frameNum);
+    rerun::Color c{};
     switch (color) {
     case 0:
         c = rerun::Color(0, 0, 0);
@@ -78,7 +79,6 @@ inline void log3DPoint(const rerun::RecordingStream& rec, const gtsam::Point3& p
             c = rerun::Color(255, 255, 255); break;
     }
 
-    rec.set_time_sequence("Frame", frameNum);
     std::vector<rerun::Position3D> points = {rerun::Position3D(point.x(), point.y(), point.z())};
     // rec.log(entity, rerun::Points3D(points).with_colors(c).with_radii(2.65));
     rec.log(entity, rerun::Points3D(points).with_colors(c));
@@ -90,6 +90,7 @@ inline void logTextTrace(const rerun::RecordingStream& rec, const std::string& t
 }
 
 inline void logPose(const rerun::RecordingStream& rec, gtsam::Pose3 pose, const int frameNum, const std::string& entity) {
+    rec.set_time_sequence("Frame", frameNum);
     const rerun::Mat3x3 rot(static_cast<Eigen::Matrix3f>(
                                     pose.rotation().matrix().cast<float>())
                                 .data());

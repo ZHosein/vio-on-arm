@@ -31,6 +31,8 @@ namespace prototype3 {
     using namespace experiments;
 
     void slam() {
+        auto rec = startLogger("Prototype3");
+
         initObjPoints(objPoints);
 
         gtsam::NonlinearISAM isam{};
@@ -40,16 +42,22 @@ namespace prototype3 {
 
         int worldTagID;
         int poseNum = 0;
+        int landmarkNum = 0;
         gtsam::Pose3 prev_wTc;
         std::map<int, Tag> observedTags;
         // 3 tags alone: 45-53
         // 45-59 no crash
+        // 45-629: iSAM fails...somewhere: sus f80
         for (int frame = 45; frame <= 629; frame++) {
+            // rec.set_time_sequence("Frame", static_cast<int64_t>(frame));
+
             cv::Mat image = getCVImage(static_cast<int>(frame));
 
             std::vector<int> ids;
             std::vector<std::vector<cv::Point2f>> corners;
             getCorners(image, ids, corners);
+            cv::aruco::drawDetectedMarkers(image, corners, ids);
+
 
             gtsam::Pose3 wTc; // camera pose wrt wrld
 
@@ -105,16 +113,20 @@ namespace prototype3 {
                 // Add initial guesses to all newly observed landmarks
                 for (size_t j = 0; j < ids.size(); ++j) {
                     if (observedTags.count(ids[j]) == 0) {
+                        // get cam pose wrt world; get pts wrt world; add to graph
                         cv::Vec3d rvec, tvec;
                         cv::solvePnP(objPoints, corners[j], intrinsicsMatrix, distCoeffs,rvec, tvec);
+                        cv::drawFrameAxes(image, intrinsicsMatrix, distCoeffs, rvec, tvec, markerLength);
+
                         gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
                         auto wTt = wTc.compose(cTt);
+                        logPose(rec, wTt, frame, "world/marker" + std::to_string(ids[j]));
 
                         observedTags.insert({ids[j], {wTt, 0}});
                         gtsam::Point3 initial_lj = wTt.transformFrom(gtsam::Point3(0, 0, 0)); // coordinates of top left corner of tag
 
-                        // get cam pose wrt world; get pts wrt world; add to graph
                         valueEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
+
                     }
                 }
 
@@ -128,6 +140,8 @@ namespace prototype3 {
                         gtsam::Symbol('l', ids[j]), K);
                 }
 
+                logCVImage(rec, image, frame, "world/camera/image");
+
                 // Update iSAM with the new factors and values ONLY if all landmarks in this frame have been observed at least x2.
                 bool update = true;
                 for (int id : ids) if (observedTags[id].count < 2) update = false;
@@ -136,15 +150,22 @@ namespace prototype3 {
                     // std::cout << "Updating iSAM...\n";
                     // isam.print();
                     // isam.printStats();
-                    isam.update(factorGraph, valueEstimates);
-                    // isam.saveGraph("graph.txt");
-                    gtsam::Values currentEstimate = isam.estimate();
-                    std::cout << "****************************************************" << std::endl;
-                    std::cout << "Frame " << frame << ": " << std::endl;
-                    currentEstimate.print("Current estimate: ");
-                    // Clear the factor graph and values for the next iteration
-                    factorGraph.resize(0);
-                    valueEstimates.clear();
+                    try {
+                        isam.update(factorGraph, valueEstimates);
+                        // isam.saveGraph("graph.txt");
+                        gtsam::Values currentEstimate = isam.estimate();
+                        std::cout << "****************************************************" << std::endl;
+                        std::cout << "Frame " << frame << ": " << std::endl;
+                        currentEstimate.print("Current estimate: ");
+                        // Clear the factor graph and values for the next iteration
+                        factorGraph.resize(0);
+                        valueEstimates.clear();
+                    }
+                    catch (gtsam::IndeterminantLinearSystemException &e) {
+                        fprintf(stderr, "Indeterminate linear system exception: %s\n", e.what());
+
+                        exit(1);
+                    }
                 }
                 poseNum++;
             }
