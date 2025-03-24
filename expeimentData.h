@@ -28,9 +28,12 @@ namespace experiments {
         1025.26513671875, 0.0, 642.6650390625,
         0.0, 1025.26513671875, 359.37811279296875,
         0, 0, 1);
-    inline cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.0888574, -82.303825,
+    /*inline cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.0888574, -82.303825,
         -0.00071347022, 0.0020022474, 315.66144, 1.8588818,
-        -80.083954, 308.98071, 0, 0, 0, 0, 0, 0);
+        -80.083954, 308.98071, 0, 0, 0, 0, 0, 0);*/
+    inline cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.088857412338257,
+        -82.30382537841797, -0.0007134702173061669, 0.0020022473763674498, 315.66143798828125, 1.8588818311691284,
+        -80.08395385742188, 308.980712890625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
 
     /*const boost::shared_ptr<gtsam::Cal3DS2> K(
@@ -43,7 +46,8 @@ namespace experiments {
            distCoeffs.at<double>(0),
            distCoeffs.at<double>(1),
            distCoeffs.at<double>(2),
-           distCoeffs.at<double>(3)));*/
+           distCoeffs.at<double>(3)
+           ));*/
     const boost::shared_ptr<gtsam::Cal3DS2> K(
         new gtsam::Cal3DS2(
             intrinsicsMatrix.at<double>(0, 0),
