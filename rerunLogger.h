@@ -67,16 +67,17 @@ inline void log3DPoint(const rerun::RecordingStream& rec, const gtsam::Point3& p
     rerun::Color c{};
     switch (color) {
     case 0:
-        c = rerun::Color(0, 0, 0);
-        break;
+        c = rerun::Color(0, 0, 0);break; // black
     case 1:
-            c = rerun::Color(255, 0, 0); break;
+        c = rerun::Color(255, 0, 0); break; // red
     case 2:
-            c = rerun::Color(0, 255, 0); break;
+        c = rerun::Color(0, 255, 0); break; // green
     case 3:
-            c = rerun::Color(0, 0, 255); break;
+        c = rerun::Color(0, 0, 255); break; // blue
+    case 4:
+        c = rerun::Color(188, 77, 185); break; // purple
     default:
-            c = rerun::Color(255, 255, 255); break;
+        c = rerun::Color(255, 255, 255); break; // white
     }
 
     std::vector<rerun::Position3D> points = {rerun::Position3D(point.x(), point.y(), point.z())};
@@ -98,6 +99,17 @@ inline void logPose(const rerun::RecordingStream& rec, gtsam::Pose3 pose, const 
             pose.translation().matrix().cast<float>())
         .data());
     rec.log(entity, rerun::Transform3D(trans, rot));
+}
+
+inline void logPinholeCamera(const rerun::RecordingStream& rec, const cv::Mat& intrinsicsMatrix, const int frameNum, const std::string& entity) {
+    rec.set_time_sequence("Frame", frameNum);
+    const Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> intrinsics_Eigen(
+            const_cast<Eigen::Map<Eigen::Matrix<double, -1, -1, 1>>::PointerArgType>(intrinsicsMatrix.ptr<double>()), intrinsicsMatrix.rows, intrinsicsMatrix.cols);
+    rec.log(
+        entity,
+        rerun::Pinhole(rerun::components::PinholeProjection(
+            rerun::Mat3x3(static_cast<Eigen::Matrix3f>(intrinsics_Eigen.cast<float>()).data())))
+    );
 }
 
 #endif //RERUNLOGGER_H
