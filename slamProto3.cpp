@@ -16,7 +16,7 @@
 #include <gtsam/geometry/Point2.h>
 #include <gtsam/inference/Symbol.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
-#include <gtsam/nonlinear/NonlinearISAM.h>
+#include <gtsam/nonlinear/ISAM2.h>
 #include <gtsam/nonlinear/Values.h>
 #include <gtsam/slam/ProjectionFactor.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
@@ -32,10 +32,16 @@ namespace prototype3 {
 
     void slam() {
         auto rec = startLogger("Prototype3");
+        logPinholeCamera(rec, intrinsicsMatrix, 0, "world/camera/image");
 
         initObjPoints(objPoints);
 
-        gtsam::NonlinearISAM isam{};
+        gtsam::ISAM2Params parameters;
+        parameters.relinearizeThreshold = 0.01;
+        parameters.relinearizeSkip = 1;
+        parameters.enableDetailedResults = true;
+        parameters.factorization = gtsam::ISAM2Params::QR;
+        gtsam::ISAM2 isam(parameters);
 
         gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
         gtsam::Values valueEstimates;
@@ -48,7 +54,11 @@ namespace prototype3 {
         // 3 tags alone: 45-53
         // 45-59 no crash
         // 45-629: iSAM fails...somewhere: sus f80
-        for (int frame = 45; frame <= 629; frame++) {
+        // skip f359-420: bad init of tag 9
+        // 45-552: good for 1 .update(); fails on 2
+        // 45-280: good for 2 .update(); fails on 3
+        //for (int frame = 45; frame <= 63; frame++) {
+        for (int frame = 45; frame <= 280; frame++) {
             // rec.set_time_sequence("Frame", static_cast<int64_t>(frame));
 
             cv::Mat image = getCVImage(static_cast<int>(frame));
@@ -61,7 +71,7 @@ namespace prototype3 {
 
             gtsam::Pose3 wTc; // camera pose wrt wrld
 
-            if (ids.size() > 2) {
+            if (ids.size() > 2 && !(frame > 359 && frame < 420)) {
                 // if first pose
                 if (observedTags.empty()) {
                     worldTagID = ids[0]; // let the first tag detected be world
@@ -84,6 +94,7 @@ namespace prototype3 {
                     // add estimate for landmark l0
                     valueEstimates.insert(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0));
                 } else {
+                    bool continuous = false;
                     for (int j = 0; j < ids.size(); ++j) {
                         // calc wTc (camera pose wrt world)
                         if (observedTags.count(ids[j]) == 1) { // tag was seen before and we know its pose wrt world
@@ -102,13 +113,20 @@ namespace prototype3 {
                                 gtsam::Symbol('x', poseNum - 1), gtsam::Symbol('x', poseNum), pTc, poseNoise));
                             prev_wTc = wTc;
 
+                            continuous = true;
                             break;
                         }
+                    }
+                    // no reobserved tags in curr frame
+                    if (!continuous) {
+                        fprintf(stderr, "Loss of Continuity at frame: %d\n", frame);
+                        continue; // skip this frame
                     }
                 }
 
                  // Add an initial guess for the current camera pose
                 valueEstimates.insert(gtsam::Symbol('x', poseNum), wTc);
+                logPose(rec, wTc, frame, "world/camera");
 
                 // Add initial guesses to all newly observed landmarks
                 for (size_t j = 0; j < ids.size(); ++j) {
@@ -120,12 +138,16 @@ namespace prototype3 {
 
                         gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
                         auto wTt = wTc.compose(cTt);
-                        logPose(rec, wTt, frame, "world/marker" + std::to_string(ids[j]));
+                        logPose(rec, wTt, frame, "world/markers/tag" + std::to_string(ids[j]));
 
                         observedTags.insert({ids[j], {wTt, 0}});
                         gtsam::Point3 initial_lj = wTt.transformFrom(gtsam::Point3(0, 0, 0)); // coordinates of top left corner of tag
 
                         valueEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
+
+                        gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
+                        gtsam::Point2 projectedPoint = camera.project(initial_lj);
+                        log2DPoint(rec, projectedPoint, frame, "world/camera/image/point");
 
                     }
                 }
@@ -152,24 +174,69 @@ namespace prototype3 {
                     // isam.printStats();
                     try {
                         isam.update(factorGraph, valueEstimates);
+                        isam.update();
+
+
                         // isam.saveGraph("graph.txt");
-                        gtsam::Values currentEstimate = isam.estimate();
-                        std::cout << "****************************************************" << std::endl;
-                        std::cout << "Frame " << frame << ": " << std::endl;
-                        currentEstimate.print("Current estimate: ");
+
+                        // get estimates
+                        // gtsam::Values currentEstimate = isam.calculateEstimate();
+                        gtsam::Values currentEstimate = isam.calculateBestEstimate();
+                        // consider using .filter() to get a separate filtered views for landmarks and poses
+                        auto landmarks = currentEstimate.filter<gtsam::Point3>();
+                        std::cout << landmarks.size() << std::endl;
+                        // log tag estimates as one point cloud
+                        for (const auto& landmark : landmarks) {
+                            gtsam::Symbol key(landmark.key);
+                            gtsam::Point3 point3 = landmark.value;
+                            // std::cout << "Key: " << key.chr() << key.index()  << ", Point3: (" << point3.x() << ", " << point3.y() << ", " << point3.z() << ")" << std::endl;
+                            log3DPoint(rec, point3, frame, "world/landmarks/" + key.string(), 4);
+                        }
+                        // log pose estimates as another point cloud
+                        auto poses = currentEstimate.filter<gtsam::Pose3>();
+                        for (const auto& pose: poses) {
+                            gtsam::Symbol key(pose.key);
+                            gtsam::Pose3 pose3 = pose.value;
+                            gtsam::Point3 point3 = pose3.translation();
+                            log3DPoint(rec, point3, frame, "world/poses/" + key.string(), -1);
+                        }
                         // Clear the factor graph and values for the next iteration
                         factorGraph.resize(0);
                         valueEstimates.clear();
                     }
                     catch (gtsam::IndeterminantLinearSystemException &e) {
                         fprintf(stderr, "Indeterminate linear system exception: %s\n", e.what());
+                        gtsam::Values currentEstimate = isam.calculateEstimate();
 
+                        std::cout << "****************************************************" << std::endl;
+                        std::cout << "Frame " << frame << ": " << std::endl;
+                        // isam.getDelta().print();
+                        // currentEstimate.print("Current estimate: ");
+
+                        isam.print();
                         exit(1);
                     }
                 }
                 poseNum++;
             }
-        }
+        } // end video processing loop
+        gtsam::ISAM2Result results = isam.update();
+        results.print();
+        // std::cout << frame << std::endl;
+        auto hessian = isam.getFactorsUnsafe().linearize(isam.calculateEstimate())->hessian();
+        auto hf = hessian.first.eigenvalues();
+        std:: cout << hf;
+        auto hs = hessian.second;
+        std::cout << hs;
+
+        // auto jac = isam.getFactorsUnsafe().linearize(isam.calculateEstimate())->jacobian();
+        /*isam.update();
+        isam.update();
+        isam.update();
+        isam.update();
+        isam.print();
+        isam.getDelta().print();
+        isam.calculateEstimate().print();*/
     }
 }
 
