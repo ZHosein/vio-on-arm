@@ -9,7 +9,7 @@
 
 
 //std::string imgPath = "OAK_DICT_4x4_50_1080p.jpeg";
-std::string imgPath = "OAK_DICT_4x4_50_1080p_obstructed.jpeg";
+std::string imgPath = "inputToCopy/OAK_DICT_4x4_50_1080p_obstructed.jpeg";
 auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
 
@@ -64,7 +64,8 @@ void detectPose () {
 
     const auto rec = rerun::RecordingStream("Image pose");
     //auto result = rec.connect_tcp("10.0.0.2:9876");    <<--- not my ip, but correct port
-    auto result = rec.connect_tcp("192.168.0.8:9876");   //<<--- my ip, correct port. swap mines out for yours, whoever using it
+    //auto result = rec.connect_tcp("192.168.0.8:9876");   //<<--- my ip, correct port. swap mines out for yours, whoever using it
+    auto result = rec.connect_tcp("127.0.0.1:9876"); //localhost because, yes
     if (result.is_err()) {
         std::cout << "Failed to connect to rerun viewer";
         exit(1);
