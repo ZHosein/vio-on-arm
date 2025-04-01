@@ -19,7 +19,7 @@ if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
     cd $DIRPATH
     rm -rf $CURRENT_DIR
 fi
-sed -i 's/azure\./\//g' /etc/apt/sources.list
+sed -i 's/azure\.//g' /etc/apt/sources.list
 apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt upgrade -y
 apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
