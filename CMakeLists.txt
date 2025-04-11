@@ -10,6 +10,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(opencv/modules/core/include)
 
 add_executable(IMX main.cpp)
+find_package(GTSAM REQUIRED)
+include_directories(${GTSAM_INCLUDE_DIR})
 
 # rerun installed from script previously installed
 # find_package(rerun_sdk REQUIRED)
@@ -31,4 +33,4 @@ FetchContent_Declare(rerun_sdk URL https://github.com/rerun-io/rerun/releases/la
 FetchContent_MakeAvailable(rerun_sdk)
 
 
-target_link_libraries(IMX PRIVATE ${OpenCV_LIBS} rerun_sdk)
+target_link_libraries(IMX PRIVATE ${OpenCV_LIBS} rerun_sdk gtsam)

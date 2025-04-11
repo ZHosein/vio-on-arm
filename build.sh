@@ -70,6 +70,22 @@ if [ ! -d arrow ]; then
     cd ../../..
 fi
 
+if [ ! -d gtsam ]; then
+    git clone --branch 4.2 --depth=1 https://github.com/borglab/gtsam.git
+    cd gtsam && mkdir -p build && cd build && \
+    cmake \
+        -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DGTSAM_USE_SYSTEM_EIGEN=OFF \
+        -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
+        -DGTSAM_BUILD_TESTS=OFF \
+        -DGTSAM_BUILD_EXAMPLES=OFF \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        .. && \
+    make -j $(nproc) && make install
+    cd ../..
+fi
+
 # if [ ! -d rerun ]; then
 #     git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
 #     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
