@@ -24,7 +24,7 @@ apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt
 apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
     binutils-aarch64-linux-gnu gdb-multiarch
-add-apt-repository ppa:ubuntu-toolchain-r/test
+add-apt-repository -y ppa:ubuntu-toolchain-r/test
 apt-get update -y && apt-get upgrade -y
 apt install -y gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu gcc-8 g++-8 --fix-missing
 apt --fix-broken -y install
