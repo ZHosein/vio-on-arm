@@ -70,8 +70,8 @@ if [ ! -d arrow ]; then
     cd ../../..
 fi
 
-wget https://boostorg.jfrog.io/artifactory/main/release/1.71.0/source/boost_1_71_0.tar.gz
-tar -xf boost_1_71_0.tar.gz
+wget https://archives.boost.io/release/1.71.0/source/boost_1_71_0.tar.gz
+tar -xzf boost_1_71_0.tar.gz
 cd boost_1_71_0
 ./bootstrap.sh
 echo "using gcc : aarch64 : /usr/bin/aarch64-linux-gnu-g++-8 ;" >> user-config.jam
