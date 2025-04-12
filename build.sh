@@ -70,13 +70,27 @@ if [ ! -d arrow ]; then
     cd ../../..
 fi
 
+wget https://boostorg.jfrog.io/artifactory/main/release/1.71.0/source/boost_1_71_0.tar.gz
+tar -xf boost_1_71_0.tar.gz
+cd boost_1_71_0
+./bootstrap.sh
+echo "using gcc : aarch64 : /usr/bin/aarch64-linux-gnu-g++-8 ;" >> user-config.jam
+./b2 toolset=gcc-aarch64 \
+    --prefix=/usr/local/boost-aarch64 \
+    --build-dir=build-aarch64 \
+    --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex \
+    target-os=linux \
+    link=static runtime-link=static threading=multi \
+    architecture=arm address-model=64 \
+    install
+
 if [ ! -d gtsam ]; then
     git clone --branch 4.2 --depth=1 https://github.com/borglab/gtsam.git
     cd gtsam && mkdir -p build && cd build && \
     cmake \
         -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release \
-        -DGTSAM_USE_SYSTEM_BOOST=OFF \
+        -DGTSAM_USE_SYSTEM_BOOST=ON \
         -DGTSAM_USE_SYSTEM_EIGEN=OFF \
         -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
         -DGTSAM_BUILD_TESTS=OFF \
