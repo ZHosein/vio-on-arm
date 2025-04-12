@@ -74,16 +74,13 @@ if [ ! -d boost_1_71_0 ]; then
     wget https://archives.boost.io/release/1.71.0/source/boost_1_71_0.tar.gz
     tar -xzf boost_1_71_0.tar.gz
     cd boost_1_71_0
-    echo "using gcc : aarch64 : /usr/bin/aarch64-linux-gnu-g++-8 ;" >> user-config.jam
+    echo "using gcc : aarch64 : /usr/bin/aarch64-linux-gnu-g++-8 ;" > user-config.jam
     ./bootstrap.sh
-    ./b2 toolset=gcc-aarch64 \
-        --prefix=/usr/local/boost-aarch64 \
-        --build-dir=build-aarch64 \
+    ./b2 --user-config=./user-config.jam toolset=gcc-aarch64 \
+        --prefix=/usr/local/boost-aarch64 --build-dir=build-aarch64 \
         --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex \
-        target-os=linux \
-        link=static runtime-link=static threading=multi \
-        architecture=arm address-model=64 \
-        install
+        target-os=linux link=static runtime-link=static threading=multi \
+        architecture=arm address-model=64 install
     cd ..
     rm boost_1_71_0.tar.gz
 fi
