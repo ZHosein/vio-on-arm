@@ -74,9 +74,9 @@ if [ ! -d boost_1_71_0 ]; then
     wget https://archives.boost.io/release/1.71.0/source/boost_1_71_0.tar.gz
     tar -xzf boost_1_71_0.tar.gz
     cd boost_1_71_0
-    echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user-config.jam
+    echo "using gcc : 8.4.0 : aarch64-linux-gnu-g++-8 ;" > user-config.jam
     ./bootstrap.sh
-    ./b2 --user-config=./user-config.jam toolset=gcc-arm \
+    ./b2 --user-config=./user-config.jam toolset=gcc-8.4.0 \
         --prefix=/usr/local/boost-arm --build-dir=build-arm \
         --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex \
         target-os=linux link=static runtime-link=static threading=multi \
