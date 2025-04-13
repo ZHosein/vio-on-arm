@@ -78,8 +78,6 @@ if [ ! -d boost_1_71_0 ]; then
     ./bootstrap.sh
     ./b2 --user-config=./user-config.jam toolset=gcc-8.4.0 \
         --prefix=/usr/local/boost-arm --build-dir=build-arm \
-        --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex \
-        --with-serialization --with-program_options --with-timer \
         target-os=linux link=static runtime-link=static threading=multi \
         architecture=arm address-model=64 install
     cd ..
