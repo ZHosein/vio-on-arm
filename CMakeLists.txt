@@ -12,6 +12,7 @@ include_directories(opencv/modules/core/include)
 add_executable(IMX main.cpp)
 
 include_directories(/usr/local/boost-arm/include)
+include_directories(${GTSAM_INCLUDE_DIRS}/gtsam/3rdparty/Eigen)
 find_package(GTSAM REQUIRED)
 include_directories(${GTSAM_INCLUDE_DIRS})
 
