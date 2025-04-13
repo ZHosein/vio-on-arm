@@ -79,7 +79,7 @@ if [ ! -d boost_1_71_0 ]; then
     ./b2 --user-config=./user-config.jam toolset=gcc-8.4.0 \
         --prefix=/usr/local/boost-arm --build-dir=build-arm \
         target-os=linux link=static runtime-link=static threading=multi \
-        architecture=arm address-model=64 install
+        architecture=arm address-model=64 cxxflags="-fPIC" cflags="-fPIC" install
     cd ..
     rm boost_1_71_0.tar.gz
 fi
