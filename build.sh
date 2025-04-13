@@ -13,13 +13,14 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export RUSTFLAGS="-C linker=/usr/bin/aarch64-linux-gnu-gcc-8"
 #you can place the above lines at the end of your .bashrc file
 
+
 CURRENT_DIR=$(pwd)
 if [ "$CURRENT_DIR" != "$DIRPATH" ]; then
     cp -r ./* ./.?* $DIRPATH/
     cd $DIRPATH
     rm -rf $CURRENT_DIR
 fi
-sed -i 's/azure\.//g' /etc/apt/sources.list
+sed -i 's/azure\.//g' /etc/apt/sources.list #if on an azure vm, switch to normal ubuntu server for packages
 apt-get update -y && apt-get install -y --no-install-recommends apt-utils && apt upgrade -y
 apt-get update -y && apt-get install -y git cmake tzdata
 apt install -y curl wget gcc make build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
@@ -30,17 +31,7 @@ apt install -y gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu gcc-8 g++-8 --fix
 apt --fix-broken -y install
 apt install -y gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu gcc-8 g++-8
 
-# apt install -y libgmp-dev libmpfr-dev libmpc-dev
-# wget http://ftp.gnu.org/gnu/gcc/gcc-8.5.0/gcc-8.5.0.tar.gz
-# tar -xvzf gcc-8.5.0.tar.gz
-# cd gcc-8.5.0
-# ./contrib/download_prerequisites
-# mkdir build
-# cd build
-# ../configure --target=aarch64-linux-gnu --enable-languages=c,c++ --disable-multilib --prefix=/usr
-# make -j$(nproc) install
 
-# Cross Compiling OpenCV (to /usr/local - this path is already in the dynamic linker by default
 if [ ! -d opencv_contrib ]; then
     git clone --branch 4.6.0 --depth=1 https://github.com/opencv/opencv_contrib.git
 fi
@@ -103,23 +94,8 @@ if [ ! -d gtsam ]; then
         -DBoost_INCLUDE_DIR=/usr/local/boost-arm/include \
         .. && \
     make -j $(nproc) && make install
-    # -DCMAKE_PREFIX_PATH=/usr/local/boost-arm \
     cd ../..
 fi
-
-# if [ ! -d rerun ]; then
-#     git clone --branch 0.22.1 --depth=1 https://github.com/rerun-io/rerun.git
-#     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-#     source $HOME/.cargo/env
-#     rustup target add aarch64-unknown-linux-gnu
-#     cd rerun && \
-#     mkdir -p build && cd build && \
-#     cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
-#         -DCMAKE_BUILD_TYPE=Release -DRERUN_DOWNLOAD_AND_BUILD_ARROW=OFF \
-#         -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-#     make -j $(nproc) && make install
-#     cd ../..
-# fi
 
 mkdir -p build && cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \

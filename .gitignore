@@ -32,8 +32,12 @@
 *.app
 
 # Custom
-build
+.idea
+.vscode
 *.tar.gz
+build
 opencv
 arrow
 rerun
+gtsam
+boost_1_71_0
