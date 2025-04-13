@@ -99,13 +99,12 @@ if [ ! -d gtsam ]; then
         -DGTSAM_BUILD_EXAMPLES=OFF \
         -DCMAKE_INSTALL_PREFIX=/usr/local \
         -DBOOST_ROOT=/usr/local/boost-arm \
-        -DBoost_NO_SYSTEM_PATHS=ON \
         -DBoost_USE_STATIC_LIBS=ON \
-        -DCMAKE_PREFIX_PATH=/usr/local/boost-arm \
         -DBoost_LIBRARY_DIR=/usr/local/boost-arm/lib \
         -DBoost_INCLUDE_DIR=/usr/local/boost-arm/include \
         .. && \
     make -j $(nproc) && make install
+    # -DCMAKE_PREFIX_PATH=/usr/local/boost-arm \
     cd ../..
 fi
 
