@@ -98,6 +98,7 @@ if [ ! -d gtsam ]; then
         -DCMAKE_INSTALL_PREFIX=/usr/local \
         -DBOOST_ROOT=/usr/local/boost-arm \
         -DBoost_USE_STATIC_LIBS=ON \
+        -DBoost_NO_BOOST_CMAKE=ON \
         -DBoost_LIBRARY_DIR=/usr/local/boost-arm/lib \
         -DBoost_INCLUDE_DIR=/usr/local/boost-arm/include \
         .. && \
