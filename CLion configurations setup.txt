@@ -1,0 +1,18 @@
+follow instructions at this link: https://www.jetbrains.com/help/clion/complicated-remote-scenarios.html#toolchain-docker
+    - create the Docker toolchain:
+        leave the CMake as default
+        set "Debugger" to /usr/bin/gdb-multiarch
+    - create the CMake debugger profile (make this the default by moving it to the top)
+        here's where we pass in any necessary CMake options:
+            -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DRERUN_DOWNLOAD_AND_BUILD_ARROW=OFF
+        NB: this is assumes the toolchain.cmake file is at /root (should probably pass in the explicit file path)
+            the Dockerfile currently copies the toolchain.cmake file in this folder to /root (the 21'st cmd) when building the image
+        also pass: -j12 for "Build Options" (replace 12 with your maxcpucount; tyring to use $(nproc) dosn't work in this instance
+    - build project (Main menu: Build > Build Project)
+        build using default debug: generates a natively compiled exec in cmake-build-debug
+        when creating the run config point it to that exec (when setting up the remote gdb sever)
+        set the CMake profile to the cross-compilation one and set the run config to the remote-gdb-sever
+        rebuild proj - will generate a binary in cmake-build-crosscomplie
+        edit to run config to point to that binary instead.
+
+        there's probably a more sensible way to do this though ╮(￣▽￣"")╭
