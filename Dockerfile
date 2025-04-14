@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 # To avoid tzdata asking for geographic location...
 ARG DEBIAN_FRONTEND=noninteractive

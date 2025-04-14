@@ -102,7 +102,8 @@ namespace prototype2 {
         gtsam::Values initialEstimate;
 
         const auto rec = rerun::RecordingStream("Unptomized");
-        rec.spawn().exit_on_failure();
+//        rec.spawn().exit_on_failure();
+        rec.save("LMSLAM.rrd").exit_on_failure();
         rec.set_time_sequence("Frame", 0);
 
         Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> intrinsics_Eigen(
