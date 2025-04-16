@@ -225,10 +225,10 @@ namespace baby_vSLAM {
                 // isam.print();
                 // isam.printStats();
                 try {
-                    auto update_start = high_resolution_clock::now();
+                    auto update_start = chrono::high_resolution_clock::now();
                     isam.update(factorGraph, valueEstimates);
                     isam.update();
-                    auto update_stop = high_resolution_clock::now();
+                    auto update_stop = chrono::high_resolution_clock::now();
                     auto update_duration = chrono::duration_cast<chrono::nanoseconds>(update_stop - update_start);
                     update_times.push_back(static_cast<long long>(update_duration.count())); //measurement 4 in nanoseconds
 

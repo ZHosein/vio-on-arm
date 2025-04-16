@@ -58,7 +58,6 @@ namespace baby_vSLAM {
            distCoeffs.at<double>(3)
            ));*/
     inline void load_cli_options(int argc, char **argv){
-        int rows,cols,i,j;
         std::vector<Command> commands = baby_vSLAM::parseCommands(argc,argv);
         Command *calibration = baby_vSLAM::findCommand(commands,"calibration");
         Command *images = baby_vSLAM::findCommand(commands,"imageroot");
@@ -78,6 +77,7 @@ namespace baby_vSLAM {
         load_calibration_file();
     }
     inline void load_calibration_file(){
+        int rows,cols,i,j;
         std::ifstream file(calibrationFile.c_str());
         if (!file.is_open()) {
             std::cerr << "Failed to open file: " << calibrationFile << std::endl;
