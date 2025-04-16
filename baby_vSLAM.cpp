@@ -43,77 +43,6 @@ namespace baby_vSLAM {
     gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
     gtsam::Values valueEstimates;
 
-    void process_folder_cli(int argc, char **argv) { //using cli for setup
-        baby_vSLAM::load_cli_options(argc,argv);
-        //reset values start
-        update_times.clear();
-        slam_times.clear();
-        memory_usage.clear();
-        observedTags.clear();
-        poseNum = 0;
-        rec = baby_vSLAM::startLogger("baby_vSLAM");
-        baby_vSLAM::logPinholeCamera(rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
-        baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
-
-        gtsam::ISAM2Params parameters;
-        parameters.relinearizeThreshold = 0.01;
-        parameters.relinearizeSkip = 1;
-        parameters.enableDetailedResults = true;
-        parameters.factorization = gtsam::ISAM2Params::QR;
-        isam = gtsam::ISAM2(parameters);
-        factorGraph.resize(0);
-        valueEstimates.clear();
-        //reset values stop
-        
-        // 3 tags alone: 45-53
-        // 45-59 no crash
-        // 45-629: iSAM fails...somewhere: sus f80
-        // skip f359-420: bad init of tag 9
-        // 45-552: good for 1 .update(); fails on 2
-        // 45-280: good for 2 .update(); fails on 3
-        //for (int frame = 45; frame <= 63; frame++) {
-        struct rusage usage_start, usage_stop;
-        auto cpu_start = chrono::high_resolution_clock::now();
-        getrusage(RUSAGE_SELF, &usage_start);
-        //video processing loop start
-        for (int frame = baby_vSLAM::frame_first; frame <= baby_vSLAM::frame_last; frame++) {
-            long memory_usage_start = baby_vSLAM::getCurrentRSS();
-            auto slam_start = chrono::high_resolution_clock::now();
-
-            cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
-            process_image(image,frame,poseNum);
-
-            auto slam_stop = chrono::high_resolution_clock::now();
-            auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
-            slam_times.push_back(static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
-            long memory_usage_stop = baby_vSLAM::getCurrentRSS();
-            memory_usage.push_back(static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
-        }
-        //video processing loop stop
-
-        getrusage(RUSAGE_SELF, &usage_stop);
-        auto cpu_stop = chrono::high_resolution_clock::now();
-        double user_time = (usage_stop.ru_utime.tv_sec - usage_start.ru_utime.tv_sec)
-                + (usage_stop.ru_utime.tv_usec - usage_start.ru_utime.tv_usec) / 1e6;
-        double system_time = (usage_stop.ru_stime.tv_sec - usage_start.ru_stime.tv_sec)
-                + (usage_stop.ru_stime.tv_usec - usage_start.ru_stime.tv_usec) / 1e6;
-        double real_time = chrono::duration_cast<chrono::duration<double>>(cpu_stop - cpu_start).count();
-        cpu_usage = ((system_time+user_time)/real_time)*100; //measurement 1 in percent
-
-
-        gtsam::ISAM2Result results = isam.update();
-        results.print();
-        // std::cout << frame << std::endl;
-
-
-        if(baby_vSLAM::logs){ //idk what JacHess is but I'm leaving the word here because it was here
-            write_logs();
-        }
-
-
-        
-    }
-
     void process_image(cv::Mat image, int frame, int poseNum){
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f>> corners;
@@ -312,6 +241,77 @@ namespace baby_vSLAM {
         isam.print();
         isam.getDelta().print();
         isam.calculateEstimate().print();*/
+    }
+
+    void process_folder_cli(int argc, char **argv) { //using cli for setup
+        baby_vSLAM::load_cli_options(argc,argv);
+        //reset values start
+        update_times.clear();
+        slam_times.clear();
+        memory_usage.clear();
+        observedTags.clear();
+        poseNum = 0;
+        rec = baby_vSLAM::startLogger("baby_vSLAM");
+        baby_vSLAM::logPinholeCamera(rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
+        baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
+
+        gtsam::ISAM2Params parameters;
+        parameters.relinearizeThreshold = 0.01;
+        parameters.relinearizeSkip = 1;
+        parameters.enableDetailedResults = true;
+        parameters.factorization = gtsam::ISAM2Params::QR;
+        isam = gtsam::ISAM2(parameters);
+        factorGraph.resize(0);
+        valueEstimates.clear();
+        //reset values stop
+        
+        // 3 tags alone: 45-53
+        // 45-59 no crash
+        // 45-629: iSAM fails...somewhere: sus f80
+        // skip f359-420: bad init of tag 9
+        // 45-552: good for 1 .update(); fails on 2
+        // 45-280: good for 2 .update(); fails on 3
+        //for (int frame = 45; frame <= 63; frame++) {
+        struct rusage usage_start, usage_stop;
+        auto cpu_start = chrono::high_resolution_clock::now();
+        getrusage(RUSAGE_SELF, &usage_start);
+        //video processing loop start
+        for (int frame = baby_vSLAM::frame_first; frame <= baby_vSLAM::frame_last; frame++) {
+            long memory_usage_start = baby_vSLAM::getCurrentRSS();
+            auto slam_start = chrono::high_resolution_clock::now();
+
+            cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
+            process_image(image,frame,poseNum);
+
+            auto slam_stop = chrono::high_resolution_clock::now();
+            auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
+            slam_times.push_back(static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
+            long memory_usage_stop = baby_vSLAM::getCurrentRSS();
+            memory_usage.push_back(static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
+        }
+        //video processing loop stop
+
+        getrusage(RUSAGE_SELF, &usage_stop);
+        auto cpu_stop = chrono::high_resolution_clock::now();
+        double user_time = (usage_stop.ru_utime.tv_sec - usage_start.ru_utime.tv_sec)
+                + (usage_stop.ru_utime.tv_usec - usage_start.ru_utime.tv_usec) / 1e6;
+        double system_time = (usage_stop.ru_stime.tv_sec - usage_start.ru_stime.tv_sec)
+                + (usage_stop.ru_stime.tv_usec - usage_start.ru_stime.tv_usec) / 1e6;
+        double real_time = chrono::duration_cast<chrono::duration<double>>(cpu_stop - cpu_start).count();
+        cpu_usage = ((system_time+user_time)/real_time)*100; //measurement 1 in percent
+
+
+        gtsam::ISAM2Result results = isam.update();
+        results.print();
+        // std::cout << frame << std::endl;
+
+
+        if(baby_vSLAM::logs){ //idk what JacHess is but I'm leaving the word here because it was here
+            write_logs();
+        }
+
+
+        
     }
 
     void process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log) { //using cli for setup

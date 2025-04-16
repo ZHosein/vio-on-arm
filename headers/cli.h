@@ -5,7 +5,7 @@
 
 
 namespace baby_vSLAM{
-    inline struct Command{ //holds cli key-value pairs
+    struct Command{ //holds cli key-value pairs
         std::string key;
         std::string val;
     };
@@ -20,7 +20,7 @@ namespace baby_vSLAM{
         Command command = {argument, value};
         return command;
     }
-    inline Command *findCommand(std::vector<Command> &commands, std::string &key){
+    inline Command *findCommand(std::vector<Command> &commands, const std::string &key){
         int i = commands.size()-1;
         while(i>=0 && commands[i].key!=key) i--;
         if(i<0) return nullptr; //the command with that key wasn't found
