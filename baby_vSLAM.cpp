@@ -66,13 +66,16 @@ namespace baby_vSLAM {
                 prev_wTc = wTc;
 
                 // Add a prior on pose x0, with 30cm std on x,y,z 0.1 rad on roll,pitch,yaw (see experimentData for noise model)
+                std::cout<<"symbol 1\n";
                 factorGraph.addPrior(gtsam::Symbol('x', poseNum), wTc, poseNoise);
 
                 // Add a prior on landmark l0
                 auto pointNoise = gtsam::noiseModel::Isotropic::Sigma(3, 0.01);
+                std::cout<<"symbol 2\n";
                 factorGraph.addPrior(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0),pointNoise);
 
                 // add estimate for landmark l0
+                std::cout<<"symbol 3\n";
                 valueEstimates.insert(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0));
             }
             else {
@@ -91,6 +94,7 @@ namespace baby_vSLAM {
                         auto wTp = prev_wTc;
                         gtsam::Pose3 pTc = wTp.inverse().compose(wTc); // pTw * wTc
 
+                        std::cout<<"symbol 4\n";
                         factorGraph.add(gtsam::BetweenFactor<gtsam::Pose3>(
                             gtsam::Symbol('x', poseNum - 1), gtsam::Symbol('x', poseNum), pTc, poseNoise));
                         prev_wTc = wTc;
@@ -107,6 +111,7 @@ namespace baby_vSLAM {
             }
 
             // Add an initial guess for the current camera pose
+            std::cout<<"symbol 5\n";
             valueEstimates.insert(gtsam::Symbol('x', poseNum), wTc);
             logPose(*rec, wTc, frame, "world/camera");
 
@@ -125,6 +130,7 @@ namespace baby_vSLAM {
                     observedTags.insert({ids[j], {wTt, 0}});
                     gtsam::Point3 initial_lj = wTt.transformFrom(gtsam::Point3(0, 0, 0)); // coordinates of top left corner of tag
 
+                    std::cout<<"symbol 6\n";
                     valueEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
 
                     gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
@@ -138,6 +144,7 @@ namespace baby_vSLAM {
             for (size_t j = 0; j < ids.size(); ++j) {
                 observedTags[ids[j]].count += 1;
                 gtsam::Point2 measurement = gtsam::Point2(corners[j][0].x, corners[j][0].y); // top left corner
+                std::cout<<"symbol 6\n";
                 factorGraph.emplace_shared<gtsam::GenericProjectionFactor<
                     gtsam::Pose3, gtsam::Point3, gtsam::Cal3DS2>>(
                     measurement, noise, gtsam::Symbol('x', poseNum),
@@ -173,6 +180,7 @@ namespace baby_vSLAM {
                     std::cout << landmarks.size() << std::endl;
                     // log tag estimates as one point cloud
                     for (const auto& landmark : landmarks) {
+                        std::cout<<"symbol 7\n";
                         gtsam::Symbol key(landmark.key);
                         gtsam::Point3 point3 = landmark.value;
                         // std::cout << "Key: " << key.chr() << key.index()  << ", Point3: (" << point3.x() << ", " << point3.y() << ", " << point3.z() << ")" << std::endl;
@@ -181,6 +189,7 @@ namespace baby_vSLAM {
                     // log pose estimates as another point cloud
                     auto poses = currentEstimate.filter<gtsam::Pose3>();
                     for (const auto& pose: poses) {
+                        std::cout<<"symbol 8\n";
                         gtsam::Symbol key(pose.key);
                         gtsam::Pose3 pose3 = pose.value;
                         gtsam::Point3 point3 = pose3.translation();
