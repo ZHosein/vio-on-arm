@@ -80,7 +80,7 @@ namespace baby_vSLAM {
             auto slam_start = chrono::high_resolution_clock::now();
 
             cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
-            process_image(image,poseNum,observedTags);
+            process_image(image,frame,poseNum);
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
@@ -113,7 +113,7 @@ namespace baby_vSLAM {
         
     }
 
-    void process_image(cv::Mat image, int poseNum, gtsam::ISAM2 isam, std::map<int,Tag> observedTags){
+    void process_image(cv::Mat image, int frame, int poseNum){
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f>> corners;
         getCorners(image, ids, corners);
