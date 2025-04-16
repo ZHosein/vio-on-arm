@@ -109,7 +109,7 @@ namespace baby_vSLAM {
 
             // Add an initial guess for the current camera pose
             valueEstimates.insert(gtsam::Symbol('x', poseNum), wTc);
-            logPose(rec, wTc, frame, "world/camera");
+            logPose(*rec, wTc, frame, "world/camera");
 
             // Add initial guesses to all newly observed landmarks
             for (size_t j = 0; j < ids.size(); ++j) {
@@ -121,7 +121,7 @@ namespace baby_vSLAM {
 
                     gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
                     auto wTt = wTc.compose(cTt);
-                    logPose(rec, wTt, frame, "world/markers/tag" + std::to_string(ids[j]));
+                    logPose(*rec, wTt, frame, "world/markers/tag" + std::to_string(ids[j]));
 
                     observedTags.insert({ids[j], {wTt, 0}});
                     gtsam::Point3 initial_lj = wTt.transformFrom(gtsam::Point3(0, 0, 0)); // coordinates of top left corner of tag
@@ -130,7 +130,7 @@ namespace baby_vSLAM {
 
                     gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
                     gtsam::Point2 projectedPoint = camera.project(initial_lj);
-                    log2DPoint(rec, projectedPoint, frame, "world/camera/image/point");
+                    log2DPoint(*rec, projectedPoint, frame, "world/camera/image/point");
 
                 }
             }
@@ -145,7 +145,7 @@ namespace baby_vSLAM {
                     gtsam::Symbol('l', ids[j]), K);
             }
 
-            baby_vSLAM::logCVImage(rec, image, frame, "world/camera/image");
+            baby_vSLAM::logCVImage(*rec, image, frame, "world/camera/image");
 
             // Update iSAM with the new factors and values ONLY if all landmarks in this frame have been observed at least x2.
             bool update = true;
@@ -177,7 +177,7 @@ namespace baby_vSLAM {
                         gtsam::Symbol key(landmark.key);
                         gtsam::Point3 point3 = landmark.value;
                         // std::cout << "Key: " << key.chr() << key.index()  << ", Point3: (" << point3.x() << ", " << point3.y() << ", " << point3.z() << ")" << std::endl;
-                        log3DPoint(rec, point3, frame, "world/landmarks/" + key.string(), 4);
+                        log3DPoint(*rec, point3, frame, "world/landmarks/" + key.string(), 4);
                     }
                     // log pose estimates as another point cloud
                     auto poses = currentEstimate.filter<gtsam::Pose3>();
@@ -185,7 +185,7 @@ namespace baby_vSLAM {
                         gtsam::Symbol key(pose.key);
                         gtsam::Pose3 pose3 = pose.value;
                         gtsam::Point3 point3 = pose3.translation();
-                        log3DPoint(rec, point3, frame, "world/poses/" + key.string(), -1);
+                        log3DPoint(*rec, point3, frame, "world/poses/" + key.string(), -1);
                     }
                     // Clear the factor graph and values for the next iteration
                     factorGraph.resize(0);
@@ -253,7 +253,7 @@ namespace baby_vSLAM {
         observedTags.clear();
         poseNum = 0;
         rec = std::make_unique<rerun::RecordingStream>(baby_vSLAM::startLogger("baby_vSLAM"));
-        baby_vSLAM::logPinholeCamera(rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
+        baby_vSLAM::logPinholeCamera(*rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
         baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
 
         gtsam::ISAM2Params parameters;
@@ -324,7 +324,7 @@ namespace baby_vSLAM {
         observedTags.clear();
         poseNum = 0;
         rec = std::make_unique<rerun::RecordingStream>(baby_vSLAM::startLogger("baby_vSLAM"));
-        baby_vSLAM::logPinholeCamera(rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
+        baby_vSLAM::logPinholeCamera(*rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
         baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
 
         gtsam::ISAM2Params parameters;
