@@ -26,6 +26,7 @@
 
 #include <rerun.hpp>
 #include <gtsam/slam/BetweenFactor.h>
+using namespace std; //wow, chrono lives INSIDE of std
 
 #include "headers/logger.h"
 #include "headers/intrinsics.h"
