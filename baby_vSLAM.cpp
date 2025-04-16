@@ -37,7 +37,7 @@ namespace baby_vSLAM {
     double cpu_usage;
     gtsam::Pose3 prev_wTc;
     vector<long long> update_times, slam_times, memory_usage;
-    rerun::RecordingStream rec;
+    rerun::RecordingStream rec = baby_vSLAM::startLogger("baby_vSLAM");
     gtsam::ISAM2 isam;
     std::map<int,Tag> observedTags;
     gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
@@ -102,7 +102,7 @@ namespace baby_vSLAM {
                 // no reobserved tags in curr frame
                 if (!continuous) {
                     fprintf(stderr, "Loss of Continuity at frame: %d\n", frame);
-                    continue; // skip this frame
+                    return; // skip this frame
                 }
             }
 
@@ -314,7 +314,7 @@ namespace baby_vSLAM {
         
     }
 
-    void process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log) { //using cli for setup
+    void process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log) { //using manual setup
         baby_vSLAM::load_manual_options(imageroot,calibration,logfile,does_log);
         //reset values start
         update_times.clear();
@@ -352,7 +352,7 @@ namespace baby_vSLAM {
             auto slam_start = chrono::high_resolution_clock::now();
 
             cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
-            process_image(image,poseNum,observedTags);
+            process_image(image,frame,poseNum);
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);

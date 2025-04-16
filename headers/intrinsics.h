@@ -57,25 +57,6 @@ namespace baby_vSLAM {
            distCoeffs.at<double>(2),
            distCoeffs.at<double>(3)
            ));*/
-    inline void load_cli_options(int argc, char **argv){
-        std::vector<Command> commands = baby_vSLAM::parseCommands(argc,argv);
-        Command *calibration = baby_vSLAM::findCommand(commands,"calibration");
-        Command *images = baby_vSLAM::findCommand(commands,"imageroot");
-        Command *log = baby_vSLAM::findCommand(commands,"logfile");
-
-        if(images!=nullptr) imgFolder=images->val;
-        calibrationFile = calibration!=nullptr? calibration->val: imgFolder+"/calibration.json";
-        if(log!=nullptr) baby_vSLAM::logFile=log->val;
-        logs = baby_vSLAM::findCommand(commands,"logs") != nullptr;
-        load_calibration_file();
-    }
-    inline void load_manual_options(std::string imageroot, std::string calibration, std::string logfile, bool does_log){
-        imgFolder = imageroot;
-        calibrationFile = calibration;
-        baby_vSLAM::logFile = logfile;
-        logs = does_log;
-        load_calibration_file();
-    }
     inline void load_calibration_file(){
         int rows,cols,i,j;
         std::ifstream file(calibrationFile.c_str());
@@ -97,6 +78,26 @@ namespace baby_vSLAM {
         distCoeffs.create(1,cols,CV_64F);
         for(j=0; j<cols; j++) distCoeffs.at<double>(0,j) = config["distCoeffs"][j];
     }
+    inline void load_cli_options(int argc, char **argv){
+        std::vector<Command> commands = baby_vSLAM::parseCommands(argc,argv);
+        Command *calibration = baby_vSLAM::findCommand(commands,"calibration");
+        Command *images = baby_vSLAM::findCommand(commands,"imageroot");
+        Command *log = baby_vSLAM::findCommand(commands,"logfile");
+
+        if(images!=nullptr) imgFolder=images->val;
+        calibrationFile = calibration!=nullptr? calibration->val: imgFolder+"/calibration.json";
+        if(log!=nullptr) baby_vSLAM::logFile=log->val;
+        logs = baby_vSLAM::findCommand(commands,"logs") != nullptr;
+        load_calibration_file();
+    }
+    inline void load_manual_options(std::string imageroot, std::string calibration, std::string logfile, bool does_log){
+        imgFolder = imageroot;
+        calibrationFile = calibration;
+        baby_vSLAM::logFile = logfile;
+        logs = does_log;
+        load_calibration_file();
+    }
+    
     inline boost::shared_ptr<gtsam::Cal3DS2> K(
         new gtsam::Cal3DS2(
             intrinsicsMatrix.at<double>(0, 0),
