@@ -43,7 +43,7 @@ namespace baby_vSLAM {
     gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
     gtsam::Values valueEstimates;
 
-    void process_image(cv::Mat image, int frame, int poseNum){
+    void process_image(cv::Mat image, int frame){
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f>> corners;
         baby_vSLAM::getCorners(image, ids, corners);
@@ -290,7 +290,7 @@ namespace baby_vSLAM {
             auto slam_start = chrono::high_resolution_clock::now();
 
             cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
-            process_image(image,frame,poseNum);
+            process_image(image,frame);
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
@@ -361,7 +361,7 @@ namespace baby_vSLAM {
             auto slam_start = chrono::high_resolution_clock::now();
 
             cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
-            process_image(image,frame,poseNum);
+            process_image(image,frame);
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
