@@ -37,10 +37,10 @@ namespace baby_vSLAM {
     double cpu_usage;
     gtsam::Pose3 prev_wTc;
     vector<long long> update_times, slam_times, memory_usage;
-    //rerun::RecordingStream rec = baby_vSLAM::startLogger("baby_vSLAM");
-    baby_vSLAM::rec = std::make_unique<rerun::RecordingStream>(
+    auto rec = baby_vSLAM::startLogger("baby_vSLAM");
+    /*rerun::RecordingStream rec = std::make_unique<rerun::RecordingStream>(
         baby_vSLAM::startLogger("baby_vSLAM")
-    );
+    );*/
     gtsam::ISAM2 isam;
     std::map<int,Tag> observedTags;
     gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
@@ -254,10 +254,10 @@ namespace baby_vSLAM {
         memory_usage.clear();
         observedTags.clear();
         poseNum = 0;
-        //rec = baby_vSLAM::startLogger("baby_vSLAM");
-        baby_vSLAM::rec = std::make_unique<rerun::RecordingStream>(
+        rec = baby_vSLAM::startLogger("baby_vSLAM");
+        /*rec = std::make_unique<rerun::RecordingStream>(
             baby_vSLAM::startLogger("baby_vSLAM")
-        );
+        );*/
         baby_vSLAM::logPinholeCamera(rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
         baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
 
@@ -328,10 +328,10 @@ namespace baby_vSLAM {
         memory_usage.clear();
         observedTags.clear();
         poseNum = 0;
-        //rec = baby_vSLAM::startLogger("baby_vSLAM");
-        baby_vSLAM::rec = std::make_unique<rerun::RecordingStream>(
+        rec = baby_vSLAM::startLogger("baby_vSLAM");
+        /*rec = std::make_unique<rerun::RecordingStream>(
             baby_vSLAM::startLogger("baby_vSLAM")
-        );
+        );*/
         baby_vSLAM::logPinholeCamera(rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
         baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
 
