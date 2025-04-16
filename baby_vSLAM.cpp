@@ -46,7 +46,7 @@ namespace baby_vSLAM {
     void process_image(cv::Mat image, int frame, int poseNum){
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f>> corners;
-        getCorners(image, ids, corners);
+        baby_vSLAM::getCorners(image, ids, corners);
         cv::aruco::drawDetectedMarkers(image, corners, ids);
 
 
