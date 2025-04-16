@@ -1,7 +1,7 @@
 #ifndef INTRINSICS_H
 #define INTRINSICS_H
 #include "cli.h"
-#include "json.h"
+#include "json.hpp"
 using json = nlohmann::json;
 #include <string>
 #include <fstream>
