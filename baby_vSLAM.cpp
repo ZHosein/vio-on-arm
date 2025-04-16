@@ -38,7 +38,6 @@ namespace baby_vSLAM {
     gtsam::Pose3 prev_wTc;
     vector<long long> update_times, slam_times, memory_usage;
     std::unique_ptr<rerun::RecordingStream> rec = nullptr;
-    rec = std::make_unique<rerun::RecordingStream>(baby_vSLAM::startLogger("baby_vSLAM"));
     gtsam::ISAM2 isam;
     std::map<int,Tag> observedTags;
     gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
