@@ -2,6 +2,7 @@
 #define INTRINSICS_H
 #include "cli.h"
 #include "json.hpp"
+#include "logger.h"
 using json = nlohmann::json;
 #include <string>
 #include <fstream>
@@ -24,20 +25,19 @@ using json = nlohmann::json;
 
 namespace baby_vSLAM {
     //variables from the cli start
-    inline int frame_first=45, frame_last=280;
-    inline std::vector<std::string> imgList;
-    inline std::string imgFolder = "datasets/roomMap";
-    inline std::string logFile = "debug.log";
-    inline std::string calibrationFile = "datasets/roomMap/calibration.json";
-    inline float markerLength = 0.111; // 1.0 == 1 meter
-    inline cv::Mat intrinsicsMatrix = (cv::Mat_<double>(3, 3) <<
+    int frame_first=45, frame_last=280;
+    std::vector<std::string> imgList;
+    std::string imgFolder = "datasets/roomMap";
+    std::string calibrationFile = "datasets/roomMap/calibration.json";
+    float markerLength = 0.111; // 1.0 == 1 meter
+    cv::Mat intrinsicsMatrix = (cv::Mat_<double>(3, 3) <<
         1025.26513671875, 0.0, 642.6650390625,
         0.0, 1025.26513671875, 359.37811279296875,
         0, 0, 1);
-    inline cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.0888574, -82.303825,
+    cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.0888574, -82.303825,
         -0.00071347022, 0.0020022474, 315.66144, 1.8588818,
         -80.083954, 308.98071, 0, 0, 0, 0, 0, 0);
-    inline bool logs = true;
+    bool logs = true;
     //variables from the cli stop
     // using these results in earlier failure...supposed to be more accurate?
     /*inline cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.088857412338257,
@@ -65,14 +65,14 @@ namespace baby_vSLAM {
 
         if(images!=nullptr) imgFolder=images->val;
         calibrationFile = calibration!=nullptr? calibration->val: imgFolder+"/calibration.json";
-        if(log!=nullptr) logFile=log->val;
+        if(log!=nullptr) baby_vSLAM::logFile=log->val;
         logs = baby_vSLAM::findCommand(commands,"logs") != nullptr;
         load_calibration_file();
     }
     inline void load_manual_options(std::string imageroot, std::string calibration, std::string logfile, bool does_log){
         imgFolder = imageroot;
         calibrationFile = calibration;
-        logFile = logfile;
+        baby_vSLAM::logFile = logfile;
         logs = does_log;
         load_calibration_file();
     }
@@ -133,7 +133,7 @@ namespace baby_vSLAM {
         return cv::imread(imgPath, cv::IMREAD_COLOR);
     }
 
-    inline struct Tag {
+    struct Tag {
         gtsam::Pose3 pose{};
         int count{};
     };

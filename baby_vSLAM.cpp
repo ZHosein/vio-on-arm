@@ -33,15 +33,15 @@ using namespace std; //wow, chrono lives INSIDE of std
 
 namespace baby_vSLAM {
 
-    inline int poseNum;
-    inline double cpu_usage;
-    inline gtsam::Pose3 prev_wTc;
-    inline vector<long long> update_times, slam_times, memory_usage;
-    inline rerun::RecordingStream rec;
-    inline gtsam::ISAM2 isam;
-    inline std::map<int,Tag> observedTags;
-    inline gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
-    inline gtsam::Values valueEstimates;
+    int poseNum;
+    double cpu_usage;
+    gtsam::Pose3 prev_wTc;
+    vector<long long> update_times, slam_times, memory_usage;
+    rerun::RecordingStream rec;
+    gtsam::ISAM2 isam;
+    std::map<int,Tag> observedTags;
+    gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
+    gtsam::Values valueEstimates;
 
     void process_folder_cli(int argc, char **argv) { //using cli for setup
         baby_vSLAM::load_cli_options(argc,argv);

@@ -22,6 +22,7 @@
 #include <gtsam/slam/ProjectionFactor.h>
 
 namespace baby_vSLAM{
+    std::string logFile = "debug.log";
     inline rerun::RecordingStream startLogger(const std::string& stream="Logger") {
         auto rec = rerun::RecordingStream(stream);
         //rec.spawn().exit_on_failure();
