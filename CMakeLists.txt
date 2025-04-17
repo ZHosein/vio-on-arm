@@ -10,7 +10,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(opencv/modules/core/include)
 
-add_executable(IMX main.cpp)
+add_executable(IMX tiny_arm_slam.cpp)
 
 include_directories(/usr/local/boost-arm/include)
 find_package(GTSAM REQUIRED)
@@ -22,17 +22,6 @@ include_directories(${GTSAM_INCLUDE_DIR}/gtsam/3rdparty/Eigen)
 # find_package(rerun_sdk REQUIRED)
 # Download the rerun_sdk
 include(FetchContent)
-
-# set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
-# set(CMAKE_BUILD_TYPE Release)
-# set(ARROW_BUILD_STATIC ON)
-# set(ARROW_DEPENDENCY_SOURCE BUNDLED)
-# set(ARROW_ENABLE_THREADING OFF)
-# set(ARROW_FLIGHT OFF)
-# set(ARROW_JEMALLOC OFF)
-# set(ARROW_MIMALLOC OFF)
-# set(ARROW_BUILD_SHARED OFF)
-# set(CMAKE_INSTALL_PREFIX /usr/local)
 
 FetchContent_Declare(rerun_sdk URL https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip)
 FetchContent_MakeAvailable(rerun_sdk)

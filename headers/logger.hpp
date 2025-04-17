@@ -21,12 +21,12 @@
 #include <gtsam/nonlinear/Values.h>
 #include <gtsam/slam/ProjectionFactor.h>
 
-namespace baby_vSLAM{
+namespace tiny_arm_slam{
     std::string logFile = "debug.log";
     inline rerun::RecordingStream startLogger(const std::string& stream="Logger") {
         auto rec = rerun::RecordingStream(stream);
         //rec.spawn().exit_on_failure();
-        rec.save(baby_vSLAM::logFile+".rrd").exit_on_failure();
+        rec.save(tiny_arm_slam::logFile+".rrd").exit_on_failure();
         rec.set_time_sequence("Frame", 0);
         return rec;
     }

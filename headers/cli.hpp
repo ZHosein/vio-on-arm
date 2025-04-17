@@ -4,7 +4,7 @@
 #include <vector>
 
 
-namespace baby_vSLAM{
+namespace tiny_arm_slam{
     struct Command{ //holds cli key-value pairs
         std::string key;
         std::string val;
@@ -13,9 +13,9 @@ namespace baby_vSLAM{
         std::string argument="", value="";
         for(int i=0;i<2;i++) if(*arg=='-') arg++; //read away - or --
     
-        while(*arg!='=' && *arg!='\0') argument+=(*arg)++; //everything before the '='
+        while(*arg!='=' && *arg!='\0') argument+=*arg++; //everything before the '='
         if(*arg=='=') arg++; //go past the '='
-        while(*arg!='\0') value+=(*arg)++;
+        while(*arg!='\0') value+=*arg++;
     
         Command command = {argument, value};
         return command;

@@ -1,8 +1,8 @@
 #ifndef INTRINSICS_H
 #define INTRINSICS_H
-#include "cli.h"
+#include "cli.hpp"
 #include "json.hpp"
-#include "logger.h"
+#include "logger.hpp"
 using json = nlohmann::json;
 #include <string>
 #include <fstream>
@@ -23,7 +23,7 @@ using json = nlohmann::json;
 #define STRING(x) #x
 #define XSTRING(x) STRING(x)
 
-namespace baby_vSLAM {
+namespace tiny_arm_slam {
     //variables from the cli start
     int frame_first=45, frame_last=280;
     std::vector<std::string> imgList;
@@ -79,21 +79,21 @@ namespace baby_vSLAM {
         for(j=0; j<cols; j++) distCoeffs.at<double>(0,j) = config["distCoeffs"][j];
     }
     inline void load_cli_options(int argc, char **argv){
-        std::vector<Command> commands = baby_vSLAM::parseCommands(argc,argv);
-        Command *calibration = baby_vSLAM::findCommand(commands,"calibration");
-        Command *images = baby_vSLAM::findCommand(commands,"imageroot");
-        Command *log = baby_vSLAM::findCommand(commands,"logfile");
+        std::vector<Command> commands = tiny_arm_slam::parseCommands(argc,argv);
+        tiny_arm_slam::Command *calibration = tiny_arm_slam::findCommand(commands,"calibration");
+        tiny_arm_slam::Command *images = tiny_arm_slam::findCommand(commands,"imageroot");
+        tiny_arm_slam::Command *log = tiny_arm_slam::findCommand(commands,"logfile");
 
         if(images!=nullptr) imgFolder=images->val;
         calibrationFile = calibration!=nullptr? calibration->val: imgFolder+"/calibration.json";
-        if(log!=nullptr) baby_vSLAM::logFile=log->val;
-        logs = baby_vSLAM::findCommand(commands,"logs") != nullptr;
+        if(log!=nullptr) tiny_arm_slam::logFile=log->val;
+        logs = tiny_arm_slam::findCommand(commands,"logs") != nullptr;
         load_calibration_file();
     }
     inline void load_manual_options(std::string imageroot, std::string calibration, std::string logfile, bool does_log){
         imgFolder = imageroot;
         calibrationFile = calibration;
-        baby_vSLAM::logFile = logfile;
+        tiny_arm_slam::logFile = logfile;
         logs = does_log;
         load_calibration_file();
     }

@@ -1,8 +1,10 @@
-//
-// Created by Zakareeyah on 3/19/25.
+// main hpp file
+// modified by Paul, adapted by Zakareeyah
 // Experimenting with iSAM (and visual odometry); minimally commented code
 // Taking first POSE as WORLD
 //
+#ifndef TINYARMSLAM_H
+#define TINYARMSLAM_H
 
 #include <iostream>
 #include <fstream>
@@ -28,10 +30,10 @@
 #include <gtsam/slam/BetweenFactor.h>
 using namespace std; //wow, chrono lives INSIDE of std
 
-#include "headers/logger.h"
-#include "headers/intrinsics.h"
+#include "headers/logger.hpp"
+#include "headers/intrinsics.hpp"
 
-namespace baby_vSLAM {
+namespace tiny_arm_slam {
 
     int poseNum;
     double cpu_usage;
@@ -43,10 +45,10 @@ namespace baby_vSLAM {
     gtsam::NonlinearFactorGraph factorGraph; // projFactors for new landmarks waiting to be observed twice
     gtsam::Values valueEstimates;
 
-    void process_image(cv::Mat image, int frame){
+    inline void process_image(cv::Mat image, int frame){
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f>> corners;
-        baby_vSLAM::getCorners(image, ids, corners);
+        tiny_arm_slam::getCorners(image, ids, corners);
         cv::aruco::drawDetectedMarkers(image, corners, ids);
 
 
@@ -60,7 +62,7 @@ namespace baby_vSLAM {
 
                 // get cTw - pose of world wrt camera
                 cv::Vec3d rvec, tvec;
-                cv::solvePnP(baby_vSLAM::objPoints, corners[0], intrinsicsMatrix, distCoeffs, rvec,tvec);
+                cv::solvePnP(tiny_arm_slam::objPoints, corners[0], intrinsicsMatrix, distCoeffs, rvec,tvec);
                 gtsam::Pose3 cTw(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
                 wTc = cTw.inverse(); // pose of camera wrt world
                 prev_wTc = wTc;
@@ -86,7 +88,7 @@ namespace baby_vSLAM {
                         gtsam::Pose3 wTt = observedTags[ids[j]].pose;
                         // pose of tag wrt wrld (transforms pts in tag crdnt frm to world)
                         cv::Vec3d rvec, tvec;
-                        cv::solvePnP(baby_vSLAM::objPoints, corners[j], intrinsicsMatrix, distCoeffs, rvec, tvec);
+                        cv::solvePnP(tiny_arm_slam::objPoints, corners[j], intrinsicsMatrix, distCoeffs, rvec, tvec);
                         gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)), gtsam::Point3(tvec.val));
                         wTc = wTt.compose(cTt.inverse()); // pose of cam wrt world
 
@@ -120,7 +122,7 @@ namespace baby_vSLAM {
                 if (observedTags.count(ids[j]) == 0) {
                     // get cam pose wrt world; get pts wrt world; add to graph
                     cv::Vec3d rvec, tvec;
-                    cv::solvePnP(baby_vSLAM::objPoints, corners[j], intrinsicsMatrix, distCoeffs,rvec, tvec);
+                    cv::solvePnP(tiny_arm_slam::objPoints, corners[j], intrinsicsMatrix, distCoeffs,rvec, tvec);
                     cv::drawFrameAxes(image, intrinsicsMatrix, distCoeffs, rvec, tvec, markerLength);
 
                     gtsam::Pose3 cTt(gtsam::Rot3::Rodrigues(gtsam::Vector3(rvec.val)),gtsam::Point3(tvec.val));
@@ -144,14 +146,14 @@ namespace baby_vSLAM {
             for (size_t j = 0; j < ids.size(); ++j) {
                 observedTags[ids[j]].count += 1;
                 gtsam::Point2 measurement = gtsam::Point2(corners[j][0].x, corners[j][0].y); // top left corner
-                std::cout<<"symbol 6\n";
+                std::cout<<"symbol 7\n";
                 factorGraph.emplace_shared<gtsam::GenericProjectionFactor<
                     gtsam::Pose3, gtsam::Point3, gtsam::Cal3DS2>>(
                     measurement, noise, gtsam::Symbol('x', poseNum),
                     gtsam::Symbol('l', ids[j]), K);
             }
 
-            baby_vSLAM::logCVImage(*rec, image, frame, "world/camera/image");
+            tiny_arm_slam::logCVImage(*rec, image, frame, "world/camera/image");
 
             // Update iSAM with the new factors and values ONLY if all landmarks in this frame have been observed at least x2.
             bool update = true;
@@ -180,7 +182,7 @@ namespace baby_vSLAM {
                     std::cout << landmarks.size() << std::endl;
                     // log tag estimates as one point cloud
                     for (const auto& landmark : landmarks) {
-                        std::cout<<"symbol 7\n";
+                        std::cout<<"symbol 8\n";
                         gtsam::Symbol key(landmark.key);
                         gtsam::Point3 point3 = landmark.value;
                         // std::cout << "Key: " << key.chr() << key.index()  << ", Point3: (" << point3.x() << ", " << point3.y() << ", " << point3.z() << ")" << std::endl;
@@ -189,7 +191,7 @@ namespace baby_vSLAM {
                     // log pose estimates as another point cloud
                     auto poses = currentEstimate.filter<gtsam::Pose3>();
                     for (const auto& pose: poses) {
-                        std::cout<<"symbol 8\n";
+                        std::cout<<"symbol 9\n";
                         gtsam::Symbol key(pose.key);
                         gtsam::Pose3 pose3 = pose.value;
                         gtsam::Point3 point3 = pose3.translation();
@@ -216,11 +218,11 @@ namespace baby_vSLAM {
         }
     }
 
-    void write_logs(){
+    inline void write_logs(){
         int i;
-        std::ofstream the_log(baby_vSLAM::logFile.c_str());
+        std::ofstream the_log(tiny_arm_slam::logFile.c_str());
         if(!the_log.is_open()){
-            std::cerr << "Failed to write to log file: " << baby_vSLAM::logFile << std::endl;
+            std::cerr << "Failed to write to log file: " << tiny_arm_slam::logFile << std::endl;
             exit(1);
         }
         the_log << "CPU Usage(%): " << cpu_usage << "%";
@@ -252,17 +254,17 @@ namespace baby_vSLAM {
         isam.calculateEstimate().print();*/
     }
 
-    void process_folder_cli(int argc, char **argv) { //using cli for setup
-        baby_vSLAM::load_cli_options(argc,argv);
+    inline void process_folder_cli(int argc, char **argv) { //using cli for setup
+        tiny_arm_slam::load_cli_options(argc,argv);
         //reset values start
         update_times.clear();
         slam_times.clear();
         memory_usage.clear();
         observedTags.clear();
         poseNum = 0;
-        rec = std::make_unique<rerun::RecordingStream>(baby_vSLAM::startLogger("baby_vSLAM"));
-        baby_vSLAM::logPinholeCamera(*rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
-        baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
+        rec = std::make_unique<rerun::RecordingStream>(tiny_arm_slam::startLogger("tiny_arm_slam"));
+        tiny_arm_slam::logPinholeCamera(*rec, tiny_arm_slam::intrinsicsMatrix, 0, "world/camera/image");
+        tiny_arm_slam::initObjPoints(tiny_arm_slam::objPoints);
 
         gtsam::ISAM2Params parameters;
         parameters.relinearizeThreshold = 0.01;
@@ -285,17 +287,17 @@ namespace baby_vSLAM {
         auto cpu_start = chrono::high_resolution_clock::now();
         getrusage(RUSAGE_SELF, &usage_start);
         //video processing loop start
-        for (int frame = baby_vSLAM::frame_first; frame <= baby_vSLAM::frame_last; frame++) {
-            long memory_usage_start = baby_vSLAM::getCurrentRSS();
+        for (int frame = tiny_arm_slam::frame_first; frame <= tiny_arm_slam::frame_last; frame++) {
+            long memory_usage_start = tiny_arm_slam::getCurrentRSS();
             auto slam_start = chrono::high_resolution_clock::now();
 
-            cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
+            cv::Mat image = tiny_arm_slam::getCVImage(static_cast<int>(frame));
             process_image(image,frame);
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
             slam_times.push_back(static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
-            long memory_usage_stop = baby_vSLAM::getCurrentRSS();
+            long memory_usage_stop = tiny_arm_slam::getCurrentRSS();
             memory_usage.push_back(static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
         }
         //video processing loop stop
@@ -315,7 +317,7 @@ namespace baby_vSLAM {
         // std::cout << frame << std::endl;
 
 
-        if(baby_vSLAM::logs){ //idk what JacHess is but I'm leaving the word here because it was here
+        if(tiny_arm_slam::logs){ //idk what JacHess is but I'm leaving the word here because it was here
             write_logs();
         }
 
@@ -323,17 +325,17 @@ namespace baby_vSLAM {
         
     }
 
-    void process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log) { //using manual setup
-        baby_vSLAM::load_manual_options(imageroot,calibration,logfile,does_log);
+    inline void process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log) { //using manual setup
+        tiny_arm_slam::load_manual_options(imageroot,calibration,logfile,does_log);
         //reset values start
         update_times.clear();
         slam_times.clear();
         memory_usage.clear();
         observedTags.clear();
         poseNum = 0;
-        rec = std::make_unique<rerun::RecordingStream>(baby_vSLAM::startLogger("baby_vSLAM"));
-        baby_vSLAM::logPinholeCamera(*rec, baby_vSLAM::intrinsicsMatrix, 0, "world/camera/image");
-        baby_vSLAM::initObjPoints(baby_vSLAM::objPoints);
+        rec = std::make_unique<rerun::RecordingStream>(tiny_arm_slam::startLogger("tiny_arm_slam"));
+        tiny_arm_slam::logPinholeCamera(*rec, tiny_arm_slam::intrinsicsMatrix, 0, "world/camera/image");
+        tiny_arm_slam::initObjPoints(tiny_arm_slam::objPoints);
 
         gtsam::ISAM2Params parameters;
         parameters.relinearizeThreshold = 0.01;
@@ -356,17 +358,17 @@ namespace baby_vSLAM {
         auto cpu_start = chrono::high_resolution_clock::now();
         getrusage(RUSAGE_SELF, &usage_start);
         //video processing loop start
-        for (int frame = baby_vSLAM::frame_first; frame <= baby_vSLAM::frame_last; frame++) {
-            long memory_usage_start = baby_vSLAM::getCurrentRSS();
+        for (int frame = tiny_arm_slam::frame_first; frame <= tiny_arm_slam::frame_last; frame++) {
+            long memory_usage_start = tiny_arm_slam::getCurrentRSS();
             auto slam_start = chrono::high_resolution_clock::now();
 
-            cv::Mat image = baby_vSLAM::getCVImage(static_cast<int>(frame));
+            cv::Mat image = tiny_arm_slam::getCVImage(static_cast<int>(frame));
             process_image(image,frame);
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
             slam_times.push_back(static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
-            long memory_usage_stop = baby_vSLAM::getCurrentRSS();
+            long memory_usage_stop = tiny_arm_slam::getCurrentRSS();
             memory_usage.push_back(static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
         }
         //video processing loop stop
@@ -386,7 +388,7 @@ namespace baby_vSLAM {
         // std::cout << frame << std::endl;
 
 
-        if(baby_vSLAM::logs){ //idk what JacHess is but I'm leaving the word here because it was here
+        if(tiny_arm_slam::logs){ //idk what JacHess is but I'm leaving the word here because it was here
             write_logs();
         }
 
@@ -394,5 +396,4 @@ namespace baby_vSLAM {
         
     }
 }
-
-
+#endif //TINYARMSLAM_H
