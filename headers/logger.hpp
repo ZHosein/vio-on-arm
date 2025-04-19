@@ -23,10 +23,11 @@
 
 namespace tiny_arm_slam{
     std::string logFile = "debug.log";
+    bool logs = true;
     inline rerun::RecordingStream startLogger(const std::string& stream="Logger") {
         auto rec = rerun::RecordingStream(stream);
         //rec.spawn().exit_on_failure();
-        rec.save(tiny_arm_slam::logFile+".rrd").exit_on_failure();
+        if(logs) rec.save(tiny_arm_slam::logFile+".rrd").exit_on_failure();
         rec.set_time_sequence("Frame", 0);
         return rec;
     }

@@ -37,7 +37,6 @@ namespace tiny_arm_slam {
     cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.0888574, -82.303825,
         -0.00071347022, 0.0020022474, 315.66144, 1.8588818,
         -80.083954, 308.98071, 0, 0, 0, 0, 0, 0);
-    bool logs = true;
     //variables from the cli stop
     // using these results in earlier failure...supposed to be more accurate?
     /*inline cv::Mat distCoeffs = (cv::Mat_<double>(1, 14) << 2.088857412338257,
@@ -64,6 +63,12 @@ namespace tiny_arm_slam {
             std::cerr << "Failed to open file: " << calibrationFile << std::endl;
             exit(1);
         }
+        std::cout<<"Processing Images at "<<imgFolder<<" with calibration file "<<calibrationFile<<std::endl;
+        if(tiny_arm_slam::logs){
+            std::cout<<"Logging Enabled to text log file "<<tiny_arm_slam::logFile
+            <<" and rerun log file "<<tiny_arm_slam::logFile<<".rrd"<<std::endl;
+        }
+        else std::cout<<"Logging Disabled"<<std::endl;
         json config;
         file>>config;
         markerLength = config["markerLength"];
@@ -87,14 +92,14 @@ namespace tiny_arm_slam {
         if(images!=nullptr) imgFolder=images->val;
         calibrationFile = calibration!=nullptr? calibration->val: imgFolder+"/calibration.json";
         if(log!=nullptr) tiny_arm_slam::logFile=log->val;
-        logs = tiny_arm_slam::findCommand(commands,"logs") != nullptr;
+        tiny_arm_slam::logs = tiny_arm_slam::findCommand(commands,"logs") != nullptr;
         load_calibration_file();
     }
     inline void load_manual_options(std::string imageroot, std::string calibration, std::string logfile, bool does_log){
         imgFolder = imageroot;
         calibrationFile = calibration;
         tiny_arm_slam::logFile = logfile;
-        logs = does_log;
+        tiny_arm_slam::logs = does_log;
         load_calibration_file();
     }
     

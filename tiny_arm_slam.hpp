@@ -68,16 +68,13 @@ namespace tiny_arm_slam {
                 prev_wTc = wTc;
 
                 // Add a prior on pose x0, with 30cm std on x,y,z 0.1 rad on roll,pitch,yaw (see experimentData for noise model)
-                std::cout<<"symbol 1\n";
                 factorGraph.addPrior(gtsam::Symbol('x', poseNum), wTc, poseNoise);
 
                 // Add a prior on landmark l0
                 auto pointNoise = gtsam::noiseModel::Isotropic::Sigma(3, 0.01);
-                std::cout<<"symbol 2\n";
                 factorGraph.addPrior(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0),pointNoise);
 
                 // add estimate for landmark l0
-                std::cout<<"symbol 3\n";
                 valueEstimates.insert(gtsam::Symbol('l', ids[0]), gtsam::Point3(0, 0, 0));
             }
             else {
@@ -96,7 +93,6 @@ namespace tiny_arm_slam {
                         auto wTp = prev_wTc;
                         gtsam::Pose3 pTc = wTp.inverse().compose(wTc); // pTw * wTc
 
-                        std::cout<<"symbol 4\n";
                         factorGraph.add(gtsam::BetweenFactor<gtsam::Pose3>(
                             gtsam::Symbol('x', poseNum - 1), gtsam::Symbol('x', poseNum), pTc, poseNoise));
                         prev_wTc = wTc;
@@ -113,7 +109,6 @@ namespace tiny_arm_slam {
             }
 
             // Add an initial guess for the current camera pose
-            std::cout<<"symbol 5\n";
             valueEstimates.insert(gtsam::Symbol('x', poseNum), wTc);
             logPose(*rec, wTc, frame, "world/camera");
 
@@ -132,7 +127,6 @@ namespace tiny_arm_slam {
                     observedTags.insert({ids[j], {wTt, 0}});
                     gtsam::Point3 initial_lj = wTt.transformFrom(gtsam::Point3(0, 0, 0)); // coordinates of top left corner of tag
 
-                    std::cout<<"symbol 6\n";
                     valueEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
 
                     gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
@@ -146,7 +140,6 @@ namespace tiny_arm_slam {
             for (size_t j = 0; j < ids.size(); ++j) {
                 observedTags[ids[j]].count += 1;
                 gtsam::Point2 measurement = gtsam::Point2(corners[j][0].x, corners[j][0].y); // top left corner
-                std::cout<<"symbol 7\n";
                 factorGraph.emplace_shared<gtsam::GenericProjectionFactor<
                     gtsam::Pose3, gtsam::Point3, gtsam::Cal3DS2>>(
                     measurement, noise, gtsam::Symbol('x', poseNum),
@@ -179,10 +172,9 @@ namespace tiny_arm_slam {
                     gtsam::Values currentEstimate = isam.calculateBestEstimate();
                     // consider using .filter() to get a separate filtered views for landmarks and poses
                     auto landmarks = currentEstimate.filter<gtsam::Point3>();
-                    std::cout << landmarks.size() << std::endl;
+                    //std::cout << landmarks.size() << std::endl;
                     // log tag estimates as one point cloud
                     for (const auto& landmark : landmarks) {
-                        std::cout<<"symbol 8\n";
                         gtsam::Symbol key(landmark.key);
                         gtsam::Point3 point3 = landmark.value;
                         // std::cout << "Key: " << key.chr() << key.index()  << ", Point3: (" << point3.x() << ", " << point3.y() << ", " << point3.z() << ")" << std::endl;
@@ -191,7 +183,6 @@ namespace tiny_arm_slam {
                     // log pose estimates as another point cloud
                     auto poses = currentEstimate.filter<gtsam::Pose3>();
                     for (const auto& pose: poses) {
-                        std::cout<<"symbol 9\n";
                         gtsam::Symbol key(pose.key);
                         gtsam::Pose3 pose3 = pose.value;
                         gtsam::Point3 point3 = pose3.translation();
@@ -205,8 +196,8 @@ namespace tiny_arm_slam {
                     fprintf(stderr, "Indeterminate linear system exception: %s\n", e.what());
                     gtsam::Values currentEstimate = isam.calculateEstimate();
 
-                    std::cout << "****************************************************" << std::endl;
-                    std::cout << "Frame " << frame << ": " << std::endl;
+                    std::cerr << "****************************************************" << std::endl;
+                    std::cerr << "Error at frame " << frame << std::endl;
                     // isam.getDelta().print();
                     // currentEstimate.print("Current estimate: ");
 
@@ -225,7 +216,10 @@ namespace tiny_arm_slam {
             std::cerr << "Failed to write to log file: " << tiny_arm_slam::logFile << std::endl;
             exit(1);
         }
-        the_log << "CPU Usage(%): " << cpu_usage << "%";
+        gtsam::Values currentEstimate = isam.calculateBestEstimate();
+        auto landmarks = currentEstimate.filter<gtsam::Point3>();
+        the_log << "Landmarks Discovered: "<<landmarks.size();
+        the_log << "\n\nCPU Usage(%): " << cpu_usage << "%";
         the_log << "\n\nMemory Usage(kb):\n";
         for(i=0;i<memory_usage.size();i++) the_log<<memory_usage[i]<<'\t';
         the_log << "\n\nSlam Loop Times(ns):\n";
@@ -388,9 +382,7 @@ namespace tiny_arm_slam {
         // std::cout << frame << std::endl;
 
 
-        if(tiny_arm_slam::logs){ //idk what JacHess is but I'm leaving the word here because it was here
-            write_logs();
-        }
+        if(tiny_arm_slam::logs) write_logs();
 
 
         
