@@ -31,5 +31,14 @@ namespace tiny_arm_slam{
         for(int i=1;i<argc;i++) commands.push_back(getCommand(argv[i]));
         return commands;
     }
+    inline void loadingBar(double fraction){
+        int progress = (int)(fraction*20), i;
+        std::cout<<"\r[";
+        for(i=0;i<20;i++){
+            if(i>progress) std::cout<<'|';
+            else std::cout<<'=';
+        }
+        std::cout<<']'<<std::flush;
+    }
 }
 #endif //CLI_H

@@ -63,12 +63,6 @@ namespace tiny_arm_slam {
             std::cerr << "Failed to open file: " << calibrationFile << std::endl;
             exit(1);
         }
-        std::cout<<"Processing Images at "<<imgFolder<<" with calibration file "<<calibrationFile<<std::endl;
-        if(tiny_arm_slam::logs){
-            std::cout<<"Logging Enabled to text log file "<<tiny_arm_slam::logFile
-            <<" and rerun log file "<<tiny_arm_slam::logFile<<".rrd"<<std::endl;
-        }
-        else std::cout<<"Logging Disabled"<<std::endl;
         json config;
         file>>config;
         markerLength = config["markerLength"];
@@ -82,6 +76,12 @@ namespace tiny_arm_slam {
         cols = config["distCoeffs"].size();
         distCoeffs.create(1,cols,CV_64F);
         for(j=0; j<cols; j++) distCoeffs.at<double>(0,j) = config["distCoeffs"][j];
+        std::cout<<"Processing "<<(frame_last-frame_first)<<"images at "<<imgFolder<<" with calibration file "<<calibrationFile<<std::endl;
+        if(tiny_arm_slam::logs){
+            std::cout<<"Logging Enabled to text log file "<<tiny_arm_slam::logFile
+            <<" and rerun log file "<<tiny_arm_slam::logFile<<".rrd"<<std::endl;
+        }
+        else std::cout<<"Logging Disabled"<<std::endl;
     }
     inline void load_cli_options(int argc, char **argv){
         std::vector<Command> commands = tiny_arm_slam::parseCommands(argc,argv);

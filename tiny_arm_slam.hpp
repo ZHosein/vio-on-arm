@@ -250,6 +250,7 @@ namespace tiny_arm_slam {
 
     inline void process_folder_cli(int argc, char **argv) { //using cli for setup
         tiny_arm_slam::load_cli_options(argc,argv);
+        std::cout<<std::endl;
         //reset values start
         update_times.clear();
         slam_times.clear();
@@ -295,6 +296,8 @@ namespace tiny_arm_slam {
             //memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
             //commented line above shows differences (can be negative) and line below shows the raw amount instead
             memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop)); //measurement 2 in kb
+            double total_frames = tiny_arm_slam::frame_last - tiny_arm_slam::frame_first + 1;
+            tiny_arm_slam::loadingBar(frame/total_frames);
         }
         //video processing loop stop
 
@@ -323,6 +326,7 @@ namespace tiny_arm_slam {
 
     inline void process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log) { //using manual setup
         tiny_arm_slam::load_manual_options(imageroot,calibration,logfile,does_log);
+        std::cout<<std::endl;
         //reset values start
         update_times.clear();
         slam_times.clear();
@@ -365,7 +369,11 @@ namespace tiny_arm_slam {
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
             slam_times.emplace_back(frame,static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
             long memory_usage_stop = tiny_arm_slam::getCurrentRSS();
-            memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
+            //memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
+            //commented line above shows differences (can be negative) and line below shows the raw amount instead
+            memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop)); //measurement 2 in kb
+            double total_frames = tiny_arm_slam::frame_last - tiny_arm_slam::frame_first + 1;
+            tiny_arm_slam::loadingBar(frame/total_frames);
         }
         //video processing loop stop
 
