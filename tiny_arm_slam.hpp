@@ -38,7 +38,7 @@ namespace tiny_arm_slam {
     int poseNum;
     double cpu_usage;
     gtsam::Pose3 prev_wTc;
-    vector<long long> update_times, slam_times, memory_usage;
+    std::vector<std::pair<int, long long>> update_times, slam_times, memory_usage;
     std::unique_ptr<rerun::RecordingStream> rec = nullptr;
     gtsam::ISAM2 isam;
     std::map<int,Tag> observedTags;
@@ -162,7 +162,7 @@ namespace tiny_arm_slam {
                     isam.update();
                     auto update_stop = chrono::high_resolution_clock::now();
                     auto update_duration = chrono::duration_cast<chrono::nanoseconds>(update_stop - update_start);
-                    update_times.push_back(static_cast<long long>(update_duration.count())); //measurement 4 in nanoseconds
+                    update_times.emplace_back(frame,static_cast<long long>(update_duration.count())); //measurement 4 in nanoseconds
 
 
                     // isam.saveGraph("graph.txt");
@@ -221,11 +221,11 @@ namespace tiny_arm_slam {
         the_log << "Landmarks Discovered: "<<landmarks.size();
         the_log << "\n\nCPU Usage(%): " << cpu_usage << "%";
         the_log << "\n\nMemory Usage(kb):\n";
-        for(i=0;i<memory_usage.size();i++) the_log<<memory_usage[i]<<'\t';
+        for(i=0;i<memory_usage.size();i++) the_log<<memory_usage[i].first<<','<<memory_usage[i].second<<'\t';
         the_log << "\n\nSlam Loop Times(ns):\n";
-        for(i=0;i<slam_times.size();i++) the_log<<slam_times[i]<<'\t';
+        for(i=0;i<slam_times.size();i++) the_log<<slam_times[i].first<<','<<slam_times[i].second<<'\t';
         the_log << "\n\nUpdate Times(ns):\n";
-        for(i=0;i<update_times.size();i++) the_log<<update_times[i]<<'\t';
+        for(i=0;i<update_times.size();i++) the_log<<update_times[i].first<<','<<update_times[i].second<<'\t';
 
         auto linearized = isam.getFactorsUnsafe().linearize(isam.calculateEstimate());
         auto [denseHessian, infoVec] = linearized->hessian();
@@ -290,9 +290,11 @@ namespace tiny_arm_slam {
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
-            slam_times.push_back(static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
+            slam_times.emplace_back(frame,static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
             long memory_usage_stop = tiny_arm_slam::getCurrentRSS();
-            memory_usage.push_back(static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
+            //memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
+            //commented line above shows differences (can be negative) and line below shows the raw amount instead
+            memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop)); //measurement 2 in kb
         }
         //video processing loop stop
 
@@ -361,9 +363,9 @@ namespace tiny_arm_slam {
 
             auto slam_stop = chrono::high_resolution_clock::now();
             auto slam_duration = chrono::duration_cast<chrono::nanoseconds>(slam_stop - slam_start);
-            slam_times.push_back(static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
+            slam_times.emplace_back(frame,static_cast<long long>(slam_duration.count())); //measurement 3 in nanoseconds
             long memory_usage_stop = tiny_arm_slam::getCurrentRSS();
-            memory_usage.push_back(static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
+            memory_usage.emplace_back(frame,static_cast<long long>(memory_usage_stop-memory_usage_start)); //measurement 2 in kb
         }
         //video processing loop stop
 
