@@ -225,17 +225,19 @@ namespace prototype3 {
         results.print();
         // std::cout << frame << std::endl;
 
-        std::ofstream Jac_Hess_Out("JacHess.txt");
-        auto linearized = isam.getFactorsUnsafe().linearize(isam.calculateEstimate());
-        auto [denseHessian, infoVec] = linearized->hessian();
-        Jac_Hess_Out << "Hessian Eigen Values: \n" << std::endl;
-        Jac_Hess_Out << denseHessian.eigenvalues();
-        Jac_Hess_Out << infoVec;
-        Jac_Hess_Out << "Jacobian: \n" << std::endl;
-        auto [denseJacobian, rhs_b] = linearized->jacobian();
-        Jac_Hess_Out << denseJacobian.;
-        Jac_Hess_Out << rhs_b;
-        Jac_Hess_Out.close();
+        if (bool logMatrices = false) {
+            std::ofstream Jac_Hess_Out("JacHess.txt");
+            auto linearized = isam.getFactorsUnsafe().linearize(isam.calculateEstimate());
+            auto [denseHessian, infoVec] = linearized->hessian();
+            Jac_Hess_Out << "Hessian Eigen Values: \n" << std::endl;
+            Jac_Hess_Out << denseHessian.eigenvalues();
+            Jac_Hess_Out << infoVec;
+            Jac_Hess_Out << "Jacobian: \n" << std::endl;
+            auto [denseJacobian, rhs_b] = linearized->jacobian();
+            Jac_Hess_Out << denseJacobian;
+            Jac_Hess_Out << rhs_b;
+            Jac_Hess_Out.close();
+        }
 
 
         // auto jac = isam.getFactorsUnsafe().linearize(isam.calculateEstimate())->jacobian();
