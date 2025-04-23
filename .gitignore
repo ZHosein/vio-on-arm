@@ -30,14 +30,3 @@
 *.exe
 *.out
 *.app
-
-# Custom
-*.tar.gz
-*.log
-*.rrd
-build
-opencv
-arrow
-rerun
-gtsam
-boost_1_71_0
