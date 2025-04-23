@@ -18,3 +18,8 @@ _putting in the `logs` argument enables logs, leaving it out disables logs; the 
 - Zip all of `/root` and all of `/usr/local`
 - Unzip the zipped folders and place them in their respective locations
 - run `./build/IMX` from the `/root` dir for the cross compiled program to run
+
+# Tag Generation
+genTags.sh generates each individual tag in a separate pdf.
+For each tag family the pdf's were merged and then the merged pdf's printed using a pdf printer to get the tags centred on letter sized pages.
+(See comment at top of genTags.sh for futher details).
