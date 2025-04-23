@@ -6,7 +6,7 @@ A dataset simply contains png images that are named as "image" followed by the o
 # Usage
 - `tiny_arm_slam.hpp` is the file to look for if using this as a library/dependency
 - The current configuration is using `process_folder_cli` where the arguments received are "logs", "calibration", "imageroot", "logfile"<br>
-An example is `./build/IMX -logs -calibration=path/to/calibration.json`)<br>
+An example is `./build/IMX -logs -calibration=path/to/calibration.json`<br>
 _putting in the `logs` argument enables logs, leaving it out disables logs; the other arguments would process the values given with them_
 - There is another `process_folder_manual` in which these previously command-line arguments can be passed into this function itself
 - _The function definition of **process_folder_cli** is: `process_folder_cli(int argc, char **argv)`_
