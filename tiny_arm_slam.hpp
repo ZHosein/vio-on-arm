@@ -316,7 +316,7 @@ namespace tiny_arm_slam {
         // std::cout << frame << std::endl;
 
 
-        if(tiny_arm_slam::logs){ //idk what JacHess is but I'm leaving the word here because it was here
+        if(tiny_arm_slam::logs){ //IDK what JacHess is, but I'm leaving the word here because it was here
             write_logs();
         }
 

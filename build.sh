@@ -80,6 +80,7 @@ if [ ! -d gtsam ]; then
     cmake \
         -DCMAKE_TOOLCHAIN_FILE=$DIRPATH/toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
         -DGTSAM_USE_SYSTEM_BOOST=ON \
         -DGTSAM_USE_SYSTEM_EIGEN=OFF \
         -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
