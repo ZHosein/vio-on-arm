@@ -146,6 +146,10 @@ namespace prototype3 {
 
                         valueEstimates.insert(gtsam::Symbol('l', ids[j]), initial_lj);
 
+                        // add prior to all tags - failed
+                        /*auto pointNoise = gtsam::noiseModel::Isotropic::Sigma(3, 0.01);
+                        factorGraph.addPrior(gtsam::Symbol('l', ids[j]), initial_lj,pointNoise);*/
+
                         gtsam::PinholeCamera<gtsam::Cal3DS2> camera(wTc, *K);
                         gtsam::Point2 projectedPoint = camera.project(initial_lj);
                         log2DPoint(rec, projectedPoint, frame, "world/camera/image/point");
