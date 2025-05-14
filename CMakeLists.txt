@@ -5,34 +5,20 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_compile_definitions("SOURCE_ROOT=${CMAKE_SOURCE_DIR}")
 
+
 # Linking boost (for GTSAM)
 find_package(Boost 1.65.0 REQUIRED system filesystem serialization REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-
 # Adding path to Eigen to includes (for GTSAM)
+find_package(GTSAM REQUIRED)
 include_directories(/usr/local/include/gtsam/3rdparty/)
 include_directories(/usr/local/include/gtsam/3rdparty/Eigen)
 
-find_package(GTSAM REQUIRED)
+
 #set(OpenCV_DIR /home/<username>/opencv/lib/cmake/opencv4) # leave commented out if OpenCV is installed
 find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS} ${GTSAM_INCLUDE_DIR})
 
-include_directories(${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GTSAM_INCLUDE_DIR})
-
-add_executable(Dev main.cpp
-#        rerunLogger.h
-#        opencvProjTest.h
-#        opencvProjTest.cpp
-#        expeimentData.h
-#        slamProto3.cpp
-)
-#        experiments/LMOptimize.cpp
-#        experiments/expeimentData.h)
-
-
-
-#add_executable(gtsamExample GTSAMVisualISAMExample.cpp )
-add_executable(gtsamExample "GTSAM Examples/factorGraphs.cpp" )
 
 # Download the rerun_sdk
 include(FetchContent)
@@ -42,6 +28,10 @@ FetchContent_Declare(rerun_sdk URL
 FetchContent_MakeAvailable(rerun_sdk)
 
 
-target_link_libraries(Dev ${OpenCV_LIBS} rerun_sdk ${Boost_LIBRARIES} metis-gtsam gtsam gtsam_unstable)
 
+add_executable(Dev main.cpp)
+#add_executable(gtsamExample GTSAMVisualISAMExample.cpp )
+add_executable(gtsamExample "GTSAM Examples/factorGraphs.cpp" )
+
+target_link_libraries(Dev ${OpenCV_LIBS} rerun_sdk ${Boost_LIBRARIES} metis-gtsam gtsam gtsam_unstable)
 target_link_libraries(gtsamExample ${Boost_LIBRARIES} metis-gtsam gtsam gtsam_unstable)
