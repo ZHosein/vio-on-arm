@@ -3,14 +3,20 @@
 
 int main() {
     std::cout << "Start" << std::endl;
-    prototype3::slam();
-    /*opencvProjTest test{};
-    test.TestOneImage();
-    */
-    // prototype2::slam();
-    // prototype::slam();
-    // detectPoseVid();
+
+    // create params obj
+    // create slam obj
+    // loop through frames and pass to slam obj
+        // pass frame num? logging?
+
     /*
+     *
+     *
+     *
+     */
+
+    std::cout << "END" << std::endl;
+    /* // Testing Behaviour of GTSAM Examples to modifying data
      * Defaults:
      *  8 (camera) poses
      *  8 landmarks
@@ -29,6 +35,5 @@ int main() {
     // selective_data::createPoses();
     // std::cout << "====================================SLAM+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
     // selective_data::slam();
-    std::cout << "END" << std::endl;
     return 0;
 }
