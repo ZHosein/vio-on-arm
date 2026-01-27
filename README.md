@@ -28,6 +28,30 @@ docker run -it ghcr.io/zhosein/vio-on-arm:latest
 docker build -t vio-on-arm .
 ```
 
+### Authentication for Private Access
+
+If this repository or its Docker images are private, you'll need to authenticate. We provide multiple authentication methods similar to GitHub deploy keys:
+
+#### Quick Start for Users
+1. **Using Personal Access Token** (Simplest):
+   ```bash
+   # Login to GitHub Container Registry
+   echo YOUR_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+   
+   # Pull the image
+   docker pull ghcr.io/zhosein/vio-on-arm:latest
+   ```
+
+2. **Using GitHub App** (Recommended for teams):
+   - Get credentials from the repository owner (App ID, Installation ID, Private Key)
+   - Generate a token using our helper script:
+     ```bash
+     ./scripts/generate-app-token.sh APP_ID INSTALLATION_ID private-key.pem
+     ```
+   - Use the generated token for authentication
+
+For detailed setup instructions, see [GitHub App Setup Guide](docs/GITHUB_APP_SETUP.md)
+
 ## Manual Setup
 - Firstly, the Operating System used to cross compile was _Ubuntu 20 LTS_ and it is recommended
 - Run `build.sh` on the x86 device that is doing the cross compiling (preferably a vm or a docker dedicated to just this purpose)
