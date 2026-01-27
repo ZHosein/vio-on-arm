@@ -13,6 +13,22 @@ _putting in the `logs` argument enables logs, leaving it out disables logs; the 
 - _The function definition of **process_folder_manual** is: `process_folder_manual(std::string imageroot, std::string calibration, std::string logfile, bool does_log)`_
 
 # Setup
+
+## Using Docker (Recommended)
+The easiest way to build and run this project is using the pre-built Docker image from GitHub Container Registry:
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/zhosein/vio-on-arm:latest
+
+# Run the container
+docker run -it ghcr.io/zhosein/vio-on-arm:latest
+
+# Or build the image locally
+docker build -t vio-on-arm .
+```
+
+## Manual Setup
 - Firstly, the Operating System used to cross compile was _Ubuntu 20 LTS_ and it is recommended
 - Run `build.sh` on the x86 device that is doing the cross compiling (preferably a vm or a docker dedicated to just this purpose)
 - Zip all of `/root` and all of `/usr/local`
