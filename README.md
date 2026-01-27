@@ -69,3 +69,14 @@ For detailed setup instructions, see [GitHub App Setup Guide](docs/GITHUB_APP_SE
 genTags.sh generates each individual tag in a separate pdf.
 For each tag family the pdf's were merged and then the merged pdf's printed using a pdf printer to get the tags centred on letter sized pages.
 (See comment at top of genTags.sh for futher details).
+
+# Access Control Documentation
+
+For detailed information about accessing this repository and its Docker images:
+
+- **[Quick Start Guide](docs/QUICK_START.md)** - Step-by-step instructions for users and owners
+- **[GitHub App Setup](docs/GITHUB_APP_SETUP.md)** - Complete guide to setting up GitHub App authentication
+- **[Authentication Flows](docs/AUTHENTICATION_FLOWS.md)** - Visual diagrams of authentication methods
+- **[Access Grant Template](docs/ACCESS_GRANT_TEMPLATE.md)** - Template for repository owners to grant access
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Scripts Documentation](scripts/README.md)** - Token generation helper scripts

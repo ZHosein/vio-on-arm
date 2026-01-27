@@ -50,3 +50,9 @@ boost_1_71_0
 github-app-*.pem
 .github-app/
 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+
