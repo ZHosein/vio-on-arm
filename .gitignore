@@ -41,3 +41,17 @@ arrow
 rerun
 gtsam
 boost_1_71_0
+
+# GitHub App credentials - Never commit these!
+*.pem
+*.key
+*-key.pem
+*private-key*
+github-app-*.pem
+.github-app/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+

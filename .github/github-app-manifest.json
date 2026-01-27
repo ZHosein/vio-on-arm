@@ -1,0 +1,15 @@
+{
+  "name": "VIO on ARM Access",
+  "url": "https://github.com/ZHosein/vio-on-arm",
+  "hook_attributes": {
+    "url": "https://example.com/webhook"
+  },
+  "redirect_url": "https://github.com/ZHosein/vio-on-arm",
+  "public": false,
+  "default_permissions": {
+    "contents": "read",
+    "packages": "read",
+    "metadata": "read"
+  },
+  "default_events": []
+}
